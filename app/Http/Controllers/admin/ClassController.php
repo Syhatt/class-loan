@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Classmodel;
 use Illuminate\Http\Request;
 
 class ClassController extends Controller
@@ -12,7 +13,10 @@ class ClassController extends Controller
      */
     public function index()
     {
-        return view('admin.class.index');
+        $pageTitle = 'Kelas';
+        $classes = Classmodel::all();
+
+        return view('admin.class.index', compact('pageTitle', 'classes'));
     }
 
     /**
