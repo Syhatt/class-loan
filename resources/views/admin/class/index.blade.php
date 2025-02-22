@@ -8,34 +8,35 @@
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
-                        <tr>
+                        <tr class="text-center">
+                            <th>No</th>
                             <th>Name</th>
-                            <th>Position</th>
-                            <th>Office</th>
-                            <th>Age</th>
-                            <th>Start date</th>
-                            <th>Salary</th>
+                            <th>Desc</th>
+                            <th>Image</th>
+                            <th>Is Available</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
-                    <tfoot>
-                        <tr>
-                            <th>Name</th>
-                            <th>Position</th>
-                            <th>Office</th>
-                            <th>Age</th>
-                            <th>Start date</th>
-                            <th>Salary</th>
-                        </tr>
-                    </tfoot>
                     <tbody>
-                        <tr>
-                            <td>Donna Snider</td>
-                            <td>Customer Support</td>
-                            <td>New York</td>
-                            <td>27</td>
-                            <td>2011/01/25</td>
-                            <td>$112,000</td>
-                        </tr>
+                        @foreach ($classes as $class)
+                            <tr class="text-center">
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $class->name }}</td>
+                                <td>{{ $class->desc }}</td>
+                                <td>{{ $class->image }}</td>
+                                <td>
+                                    @if ($class->is_available == true)
+                                        <span class="badge text-bg-success">Tersedia</span>
+                                    @else
+                                        <span class="badge text-bg-danger">Kosong</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <a href="" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
+                                    <a href="" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
+                                </td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
