@@ -5,6 +5,8 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\Classmodel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 
 class ClassController extends Controller
 {
@@ -24,7 +26,9 @@ class ClassController extends Controller
      */
     public function create()
     {
-        //
+        $pageTitle = 'Tambah Kelas';
+
+        return view('admin.class.create', compact('pageTitle'));
     }
 
     /**
@@ -32,7 +36,19 @@ class ClassController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'desc' => 'required',
+            'image' => 'required',
+        ]);
+
+        Classmodel::create([
+            'name' => $request->name,
+            'desc' => $request->desc,
+            'image' => $request->image,
+        ]);
+
+        return Redirect::back()->with(['success' => 'Success Store!']);
     }
 
     /**
@@ -48,7 +64,10 @@ class ClassController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $pageTitle = 'Edit Kelas';
+        $classes = Classmodel::find($id);
+
+        return view('admin.class.edit', compact('pageTitle', 'classes'));
     }
 
     /**
@@ -56,7 +75,20 @@ class ClassController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'desc' => 'required',
+            'image' => 'required',
+        ]);
+
+        $classes = Classmodel::findOrFail($id);
+        $classes->update([
+            'name' => $request->name,
+            'desc' => $request->desc,
+            'image' => $request->image,
+        ]);
+
+        return redirect()->route('class.index')->with(['success' => 'Data Berhasil Diubah!']);
     }
 
     /**
@@ -64,6 +96,8 @@ class ClassController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        Classmodel::findOrFail($id)->delete();
+
+        return redirect()->route('class.index')->with(['success' => 'Data Berhasil Diubah!']);
     }
 }
