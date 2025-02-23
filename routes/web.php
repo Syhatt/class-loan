@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\admin\ClassController;
+use App\Http\Controllers\admin\ItemController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,6 +20,7 @@ Route::get('/', function () {
 });
 // Route::get('coba', [ClassController::class, 'index']);
 Route::resource('class', ClassController::class);
+Route::resource('item', ItemController::class);
 
 Route::middleware([
     'auth:sanctum',
