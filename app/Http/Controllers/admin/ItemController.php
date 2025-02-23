@@ -3,22 +3,20 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Classmodel;
+use App\Models\Item;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Validator;
 
-class ClassController extends Controller
+class ItemController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $pageTitle = 'Kelas';
-        $classes = Classmodel::all();
+        $pageTitle = 'Barang';
+        $item = Item::all();
 
-        return view('admin.class.index', compact('pageTitle', 'classes'));
+        return view('admin.item.index', compact('pageTitle', 'item'));
     }
 
     /**
@@ -26,9 +24,9 @@ class ClassController extends Controller
      */
     public function create()
     {
-        $pageTitle = 'Tambah Kelas';
+        $pageTitle = 'Tambah Barang';
 
-        return view('admin.class.create', compact('pageTitle'));
+        return view('admin.item.create', compact('pageTitle'));
     }
 
     /**
@@ -39,16 +37,16 @@ class ClassController extends Controller
         $request->validate([
             'name' => 'required',
             'desc' => 'required',
-            'image' => 'required',
+            'stock' => 'required',
         ]);
 
-        Classmodel::create([
+        Item::create([
             'name' => $request->name,
             'desc' => $request->desc,
-            'image' => $request->image,
+            'stock' => $request->stock,
         ]);
 
-        return Redirect::back()->with(['success' => 'Success Store!']);
+        return redirect()->route('item.index')->with(['success' => 'Data Berhasil Disimpan!']);
     }
 
     /**
@@ -64,10 +62,10 @@ class ClassController extends Controller
      */
     public function edit(string $id)
     {
-        $pageTitle = 'Edit Kelas';
-        $classes = Classmodel::find($id);
+        $pageTitle = 'Edit Barang';
+        $item = Item::find($id);
 
-        return view('admin.class.edit', compact('pageTitle', 'classes'));
+        return view('admin.item.edit', compact('pageTitle', 'item'));
     }
 
     /**
@@ -78,17 +76,17 @@ class ClassController extends Controller
         $request->validate([
             'name' => 'required',
             'desc' => 'required',
-            'image' => 'required',
+            'stock' => 'required',
         ]);
 
-        $classes = Classmodel::findOrFail($id);
-        $classes->update([
+        $item = Item::findOrFail($id);
+        $item->update([
             'name' => $request->name,
             'desc' => $request->desc,
-            'image' => $request->image,
+            'stock' => $request->stock,
         ]);
 
-        return redirect()->route('class.index')->with(['success' => 'Data Berhasil Diubah!']);
+        return redirect()->route('item.index')->with(['success' => 'Data Berhasil Diubah!']);
     }
 
     /**
@@ -96,8 +94,8 @@ class ClassController extends Controller
      */
     public function destroy(string $id)
     {
-        Classmodel::findOrFail($id)->delete();
+        Item::findOrFail($id)->delete();
 
-        return redirect()->route('class.index')->with(['success' => 'Data Berhasil Diubah!']);
+        return redirect()->route('item.index')->with(['success' => 'Data Berhasil Diubah!']);
     }
 }

@@ -57,6 +57,12 @@
                     <span>Kelas</span></a>
             </li>
 
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('item.index') }}">
+                    <i class="fas fa-fw fa-laptop-house"></i>
+                    <span>Barang</span></a>
+            </li>
+
             <!-- Divider -->
             <hr class="sidebar-divider">
 
