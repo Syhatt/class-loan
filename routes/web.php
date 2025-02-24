@@ -15,10 +15,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-// Route::get('coba', [ClassController::class, 'index']);
+Route::get('/', fn () => redirect()->route('login'));
+
 Route::resource('class', ClassController::class);
 Route::resource('item', ItemController::class);
 
