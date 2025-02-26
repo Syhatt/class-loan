@@ -11,7 +11,7 @@
                         <div class="text-center">
                             <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
                         </div>
-                        <form action="{{ route('login') }}" class="user">
+                        <form action="{{ route('login') }}" method="POST" class="user">
                             @csrf
                             <div class="form-group">
                                 <input type="email" name="email" class="form-control form-control-user"

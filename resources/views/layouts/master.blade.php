@@ -46,7 +46,7 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
-                <a class="nav-link" href="index.html">
+                <a class="nav-link" href="{{ route('dashboard') }}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>
@@ -61,6 +61,12 @@
                 <a class="nav-link" href="{{ route('item.index') }}">
                     <i class="fas fa-fw fa-laptop-house"></i>
                     <span>Barang</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('booking.index') }}">
+                    <i class="fas fa-fw fa-laptop-house"></i>
+                    <span>Peminjaman</span></a>
             </li>
 
             <!-- Divider -->
@@ -143,7 +149,8 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
+                                <span
+                                    class="mr-2 d-none d-lg-inline text-gray-600 small">{{ auth()->user()->name }}</span>
                                 <img class="img-profile rounded-circle" src="img/undraw_profile.svg">
                             </a>
                             <!-- Dropdown - User Information -->
