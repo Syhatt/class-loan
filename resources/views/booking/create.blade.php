@@ -16,23 +16,122 @@
                 <form action="{{ route('booking.store') }}" method="post">
                     @csrf
                     <div class="form-group">
-                        <label>Nama</label>
-                        <input type="text" name="name" class="form-control">
-                        @error('name')
+                        <label>Kelas</label>
+                        <input type="text" class="form-control" value="{{ $class->name }}" readonly>
+                        <input type="hidden" name="classmodel_id" value="{{ $class->id }}">
+                        @error('classmodel_id')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
                     <div class="form-group">
-                        <label>Deskripsi</label>
-                        <textarea name="desc" cols="30" rows="10" class="form-control"></textarea>
-                        @error('desc')
+                        <label>Tanggal Mulai Kegiatan</label>
+                        <input type="date" name="start_date" class="form-control">
+                        @error('start_date')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
                     <div class="form-group">
-                        <label>Stok</label>
-                        <input type="number" name="stock" class="form-control">
-                        @error('stock')
+                        <label>Tanggal Selesai Kegiatan</label>
+                        <input type="date" name="end_date" class="form-control">
+                        @error('end_date')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>Jam Mulai Kegiatan</label>
+                        <input type="time" name="start_time" class="form-control">
+                        @error('start_time')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>Jam Selesai Kegiatan</label>
+                        <input type="time" name="end_time" class="form-control">
+                        @error('end_time')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Organisasi</label>
+                        <input type="text" name="organization" class="form-control">
+                        @error('organization')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Kegiatan</label>
+                        <input type="text" name="activity_name" class="form-control">
+                        @error('activity_name')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Lengkap Mahasiswa</label>
+                        <input type="text" name="full_name" class="form-control">
+                        @error('full_name')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>NIM</label>
+                        <input type="text" name="nim" class="form-control">
+                        @error('nim')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>Semester</label>
+                        <input type="text" name="semester" class="form-control">
+                        @error('semester')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>Prodi</label>
+                        <input type="text" name="prodi" class="form-control">
+                        @error('prodi')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>No Telp</label>
+                        <input type="text" name="telp" class="form-control">
+                        @error('telp')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>No Surat Permohonan Izin Kegiatan</label>
+                        <input type="text" name="no_letter" class="form-control">
+                        @error('no_letter')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Surat Permohonan Izin Kegiatan</label>
+                        <input type="date" name="date_letter" class="form-control">
+                        @error('date_letter')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>TTD Yang Mengajukan Kegiatan</label>
+                        <input type="file" name="signature" class="form-control">
+                        @error('signature')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>Surat Permohonan Izin Kegiatan</label>
+                        <input type="file" name="apply_letter" class="form-control">
+                        @error('apply_letter')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>Proposal Kegiatan</label>
+                        <input type="file" name="activity_proposal" class="form-control">
+                        @error('activity_proposal')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
