@@ -13,7 +13,7 @@
                     Kembali</a>
             </div>
             <div class="card-body">
-                <form action="{{ route('booking.store') }}" method="post">
+                <form action="{{ route('booking.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="form-group">
                         <label>Kelas</label>
@@ -25,91 +25,91 @@
                     </div>
                     <div class="form-group">
                         <label>Tanggal Mulai Kegiatan</label>
-                        <input type="date" name="start_date" class="form-control">
+                        <input type="date" name="start_date" class="form-control" value="{{ old('start_date') }}">
                         @error('start_date')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
                     <div class="form-group">
                         <label>Tanggal Selesai Kegiatan</label>
-                        <input type="date" name="end_date" class="form-control">
+                        <input type="date" name="end_date" class="form-control" value="{{ old('end_date') }}">
                         @error('end_date')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
                     <div class="form-group">
                         <label>Jam Mulai Kegiatan</label>
-                        <input type="time" name="start_time" class="form-control">
+                        <input type="time" name="start_time" class="form-control" value="{{ old('start_time') }}">
                         @error('start_time')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
                     <div class="form-group">
                         <label>Jam Selesai Kegiatan</label>
-                        <input type="time" name="end_time" class="form-control">
+                        <input type="time" name="end_time" class="form-control" value="{{ old('end_time') }}">
                         @error('end_time')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
                     <div class="form-group">
                         <label>Nama Organisasi</label>
-                        <input type="text" name="organization" class="form-control">
+                        <input type="text" name="organization" class="form-control" value="{{ old('organization') }}">
                         @error('organization')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
                     <div class="form-group">
                         <label>Nama Kegiatan</label>
-                        <input type="text" name="activity_name" class="form-control">
+                        <input type="text" name="activity_name" class="form-control" value="{{ old('activity_name') }}">
                         @error('activity_name')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
                     <div class="form-group">
                         <label>Nama Lengkap Mahasiswa</label>
-                        <input type="text" name="full_name" class="form-control">
+                        <input type="text" name="full_name" class="form-control" value="{{ old('full_name') }}">
                         @error('full_name')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
                     <div class="form-group">
                         <label>NIM</label>
-                        <input type="text" name="nim" class="form-control">
+                        <input type="text" name="nim" class="form-control" value="{{ old('nim') }}">
                         @error('nim')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
                     <div class="form-group">
                         <label>Semester</label>
-                        <input type="text" name="semester" class="form-control">
+                        <input type="text" name="semester" class="form-control" value="{{ old('semester') }}">
                         @error('semester')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
                     <div class="form-group">
                         <label>Prodi</label>
-                        <input type="text" name="prodi" class="form-control">
+                        <input type="text" name="prodi" class="form-control" value="{{ old('prodi') }}">
                         @error('prodi')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
                     <div class="form-group">
                         <label>No Telp</label>
-                        <input type="text" name="telp" class="form-control">
+                        <input type="text" name="telp" class="form-control" value="{{ old('telp') }}">
                         @error('telp')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
                     <div class="form-group">
                         <label>No Surat Permohonan Izin Kegiatan</label>
-                        <input type="text" name="no_letter" class="form-control">
+                        <input type="text" name="no_letter" class="form-control" value="{{ old('no_letter') }}">
                         @error('no_letter')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
                     <div class="form-group">
                         <label>Tanggal Surat Permohonan Izin Kegiatan</label>
-                        <input type="date" name="date_letter" class="form-control">
+                        <input type="date" name="date_letter" class="form-control" value="{{ old('date_letter') }}">
                         @error('date_letter')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
