@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BookingClass;
 use App\Models\Classmodel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
@@ -36,7 +37,6 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            // 'user_id' => auth()->user()->name,
             'classmodel_id' => 'required',
             'start_date' => 'required',
             'end_date' => 'required',
@@ -100,14 +100,8 @@ class BookingController extends Controller
             'apply_letter' => $filePaths['apply_letter'] ?? null,
             'activity_proposal' => $filePaths['activity_proposal'] ?? null,
         ]);
-        return redirect()->route('booking.index')->with(['success' => 'Data Berhasil Disimpan!']);
-        // $sig = time() . '.' . $request->signature->extension();
-        // $apply = time() . '.' . $request->apply_letter->extension();
-        // $activity = time() . '.' . $request->activity_proposal->extension();
 
-        // $request->signature->move(public_path('uploads'), $sig);
-        // $request->apply_letter->move(public_path('uploads'), $apply);
-        // $request->activity_proposal->move(public_path('uploads'), $activity);
+        return redirect()->route('booking.index')->with(['success' => 'Data Berhasil Disimpan!']);
     }
 
     /**
