@@ -58,6 +58,12 @@
             </li>
 
             <li class="nav-item">
+                <a class="nav-link" href="{{ route('bookclass.index') }}">
+                    <i class="fas fa-fw fa-laptop-house"></i>
+                    <span>Data Peminjaman Kelas</span></a>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link" href="{{ route('item.index') }}">
                     <i class="fas fa-fw fa-laptop-house"></i>
                     <span>Barang</span></a>
@@ -66,7 +72,13 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('booking.index') }}">
                     <i class="fas fa-fw fa-laptop-house"></i>
-                    <span>Peminjaman</span></a>
+                    <span>Pinjam Ruangan</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('mybook') }}">
+                    <i class="fas fa-fw fa-laptop-house"></i>
+                    <span>Peminjaman Saya</span></a>
             </li>
 
             <!-- Divider -->

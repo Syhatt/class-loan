@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\admin\BookClassController;
 use App\Http\Controllers\admin\ClassController;
 use App\Http\Controllers\admin\ItemController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\MyBookController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,7 +32,9 @@ Route::middleware([
 
 Route::group(['middleware' => 'auth'], function () {
     Route::resource('class', ClassController::class);
+    Route::resource('bookclass', BookClassController::class);
     Route::resource('item', ItemController::class);
     Route::resource('booking', BookingController::class);
     Route::get('booking/tambah/{id}', [BookingController::class, 'create'])->name('booking.tambah');
+    Route::get('mybook', [MyBookController::class, 'index'])->name('mybook');
 });
