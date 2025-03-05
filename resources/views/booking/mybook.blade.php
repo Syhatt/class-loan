@@ -35,7 +35,16 @@
                                 <td>{{ $booking->end_time }}</td>
                                 <td>{{ $booking->activity_name }}</td>
                                 <td>{{ $booking->organization }}</td>
-                                <td>{{ $booking->status }}</td>
+                                {{-- <td>{{ $booking->status }}</td> --}}
+                                <td>
+                                    @if ($booking->status == "approved")
+                                        <span class="badge badge-success">Approved</span>
+                                    @elseif ($booking->status == "rejected")
+                                        <span class="badge badge-danger">rejected</span>
+                                    @else
+                                        <span class="badge badge-warning">Pending</span>
+                                    @endif
+                                </td>
                                 <td>
                                     <form action="{{ route('booking.destroy', $booking->id) }}" method="post">
                                         @csrf

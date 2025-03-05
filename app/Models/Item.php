@@ -10,4 +10,9 @@ class Item extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public function bookingItems()
+    {
+        return $this->hasMany(BookingItem::class);
+    }
 }
