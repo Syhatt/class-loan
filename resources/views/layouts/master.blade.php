@@ -58,27 +58,33 @@
             </li>
 
             <li class="nav-item">
+                <a class="nav-link" href="{{ route('booking.index') }}">
+                    <i class="fas fa-fw fa-map-marked-alt"></i>
+                    <span>Pinjam Kelas</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('mybook') }}">
+                    <i class="fas fa-fw fa-bookmark"></i>
+                    <span>Peminjaman Saya</span></a>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link" href="{{ route('bookclass.index') }}">
-                    <i class="fas fa-fw fa-laptop-house"></i>
+                    <i class="fas fa-fw fa-table"></i>
                     <span>Data Peminjaman Kelas</span></a>
             </li>
 
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('item.index') }}">
-                    <i class="fas fa-fw fa-laptop-house"></i>
+                    <i class="fas fa-fw fa-toolbox"></i>
                     <span>Barang</span></a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('booking.index') }}">
-                    <i class="fas fa-fw fa-laptop-house"></i>
-                    <span>Pinjam Ruangan</span></a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('mybook') }}">
-                    <i class="fas fa-fw fa-laptop-house"></i>
-                    <span>Peminjaman Saya</span></a>
+                <a class="nav-link" href="{{ route('bookingitem.index') }}">
+                    <i class="fas fa-fw fa-search-location"></i>
+                    <span>Pinjam Barang</span></a>
             </li>
 
             <!-- Divider -->
