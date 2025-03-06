@@ -14,7 +14,7 @@ class ItemController extends Controller
     public function index()
     {
         $pageTitle = 'Barang';
-        $item = Item::all();
+        $item = Item::where('faculty_id', auth()->user()->faculty_id)->get();
 
         return view('admin.item.index', compact('pageTitle', 'item'));
     }

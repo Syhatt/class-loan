@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\admin\BookClassController;
+use App\Http\Controllers\admin\BookItemController;
 use App\Http\Controllers\admin\ClassController;
 use App\Http\Controllers\admin\ItemController;
 use App\Http\Controllers\BookingController;
@@ -54,6 +55,7 @@ Route::middleware(['auth', 'role:admin_ruangan'])->group(function(){
 
 Route::middleware(['auth', 'role:admin_barang'])->group(function(){
     Route::resource('item', ItemController::class);
+    Route::resource('bookitem', BookItemController::class);
     Route::resource('bookingitem', BookingItemController::class);
     Route::get('bookingitem/tambah/{id}', [BookingItemController::class, 'create'])->name('bookingitem.tambah');
 });
