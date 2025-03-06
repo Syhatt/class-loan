@@ -51,7 +51,58 @@
                     <span>Dashboard</span></a>
             </li>
 
-            <li class="nav-item">
+            @if (auth()->user()->role == 'admin_ruangan')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('class.index') }}">
+                        <i class="fas fa-fw fa-laptop-house"></i>
+                        <span>Kelas</span></a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('bookclass.index') }}">
+                        <i class="fas fa-fw fa-table"></i>
+                        <span>Data Peminjaman Kelas</span></a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('booking.index') }}">
+                        <i class="fas fa-fw fa-map-marked-alt"></i>
+                        <span>Pinjam Kelas</span></a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('mybook') }}">
+                        <i class="fas fa-fw fa-bookmark"></i>
+                        <span>Peminjaman Saya</span></a>
+                </li>
+            @elseif(auth()->user()->role == 'admin_barang')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('item.index') }}">
+                        <i class="fas fa-fw fa-toolbox"></i>
+                        <span>Barang</span></a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('bookingitem.index') }}">
+                        <i class="fas fa-fw fa-search-location"></i>
+                        <span>Pinjam Barang</span></a>
+                </li>
+            @elseif(auth()->user()->role == 'user')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('booking.index') }}">
+                        <i class="fas fa-fw fa-map-marked-alt"></i>
+                        <span>Pinjam Kelas</span></a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('mybook') }}">
+                        <i class="fas fa-fw fa-bookmark"></i>
+                        <span>Peminjaman Saya</span></a>
+                </li>
+                {{-- @else --}}
+            @endif
+
+            {{-- <li class="nav-item">
                 <a class="nav-link" href="{{ route('class.index') }}">
                     <i class="fas fa-fw fa-laptop-house"></i>
                     <span>Kelas</span></a>
@@ -85,7 +136,7 @@
                 <a class="nav-link" href="{{ route('bookingitem.index') }}">
                     <i class="fas fa-fw fa-search-location"></i>
                     <span>Pinjam Barang</span></a>
-            </li>
+            </li> --}}
 
             <!-- Divider -->
             <hr class="sidebar-divider">
@@ -107,25 +158,6 @@
                         <h6 class="collapse-header">Custom Components:</h6>
                         <a class="collapse-item" href="buttons.html">Buttons</a>
                         <a class="collapse-item" href="cards.html">Cards</a>
-                    </div>
-                </div>
-            </li>
-
-            <!-- Nav Item - Utilities Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
-                    aria-expanded="true" aria-controls="collapseUtilities">
-                    <i class="fas fa-fw fa-wrench"></i>
-                    <span>Utilities</span>
-                </a>
-                <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
-                    data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Custom Utilities:</h6>
-                        <a class="collapse-item" href="utilities-color.html">Colors</a>
-                        <a class="collapse-item" href="utilities-border.html">Borders</a>
-                        <a class="collapse-item" href="utilities-animation.html">Animations</a>
-                        <a class="collapse-item" href="utilities-other.html">Other</a>
                     </div>
                 </div>
             </li>

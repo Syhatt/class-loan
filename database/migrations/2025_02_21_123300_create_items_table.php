@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('faculty_id')->constrained();
             $table->string('name');
             $table->text('desc');
             $table->integer('stock');

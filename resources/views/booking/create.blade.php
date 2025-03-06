@@ -17,6 +17,7 @@
                     @csrf
                     <div class="form-group">
                         <label>Kelas</label>
+                        <input type="hidden" name="faculty_id" value="{{ $class->faculty_id }}">
                         <input type="text" class="form-control" value="{{ $class->name }}" readonly>
                         <input type="hidden" name="classmodel_id" value="{{ $class->id }}">
                         @error('classmodel_id')

@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('classmodels', function (Blueprint $table) {
+        Schema::create('faculties', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('faculty_id')->constrained();
+            $table->string('code');
             $table->string('name');
-            $table->string('desc');
-            $table->string('image');
-            $table->boolean('is_available')->default(true);
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('classmodels');
+        Schema::dropIfExists('faculties');
     }
 };

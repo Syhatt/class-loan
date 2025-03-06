@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('booking_classes', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('faculty_id')->nullable()->constrained();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('classmodel_id')->constrained();
             $table->date('start_date');
