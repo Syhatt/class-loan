@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('faculty_id')->nullable()->constrained();
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('classmodel_id')->constrained();
+            $table->foreignId('booking_classes_id')->constrained();
             $table->foreignId('item_id')->constrained();
             $table->integer('qty');
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');

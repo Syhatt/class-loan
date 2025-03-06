@@ -61,4 +61,6 @@ Route::middleware(['auth', 'role:user,admin_ruangan'])->group(function(){
     Route::resource('booking', BookingController::class);
     Route::get('booking/tambah/{id}', [BookingController::class, 'create'])->name('booking.tambah');
     Route::get('mybook', [MyBookController::class, 'index'])->name('mybook');
+    Route::resource('bookingitem', BookingItemController::class);
+    Route::get('bookingitem/tambah/{id}', [BookingItemController::class, 'create'])->name('bookingitem.tambah');
 });
