@@ -83,6 +83,12 @@
                 </li>
 
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ route('bookitem.index') }}">
+                        <i class="fas fa-fw fa-table"></i>
+                        <span>Data Peminjaman Barang</span></a>
+                </li>
+
+                <li class="nav-item">
                     <a class="nav-link" href="{{ route('bookingitem.index') }}">
                         <i class="fas fa-fw fa-box-open"></i>
                         <span>Pinjam Barang</span></a>
