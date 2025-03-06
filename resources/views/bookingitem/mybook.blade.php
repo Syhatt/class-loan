@@ -15,44 +15,41 @@
                     <thead>
                         <tr class="text-center">
                             <th>No</th>
-                            <th>Ruangan</th>
-                            <th>Tanggal Peminjaman</th>
-                            <th>Waktu Mulai</th>
-                            <th>Waktu Selesai</th>
-                            <th>Keperluan</th>
-                            <th>Jaminan</th>
+                            <th>Fakultas</th>
+                            <th>User</th>
+                            <th>Kelas</th>
+                            <th>Barang</th>
+                            <th>Jumlah</th>
                             <th>Status</th>
-                            <th>Action</th>
+                            {{-- <th>Action</th> --}}
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($booking as $booking)
+                        @foreach ($bookitem as $bookitem)
                             <tr class="text-center">
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $booking->classmodel->name }}</td>
-                                <td>{{ $booking->start_date }}</td>
-                                <td>{{ $booking->start_time }}</td>
-                                <td>{{ $booking->end_time }}</td>
-                                <td>{{ $booking->activity_name }}</td>
-                                <td>{{ $booking->organization }}</td>
-                                {{-- <td>{{ $booking->status }}</td> --}}
+                                <td>{{ $bookitem->faculty->name }}</td>
+                                <td>{{ $bookitem->user->name }}</td>
+                                <td>{{ $bookitem->booking_classes_id }}</td>
+                                <td>{{ $bookitem->item->name }}</td>
+                                <td>{{ $bookitem->qty }}</td>
                                 <td>
-                                    @if ($booking->status == "approved")
+                                    @if ($bookitem->status == "approved")
                                         <span class="badge badge-success">Approved</span>
-                                    @elseif ($booking->status == "rejected")
+                                    @elseif ($bookitem->status == "rejected")
                                         <span class="badge badge-danger">rejected</span>
                                     @else
                                         <span class="badge badge-warning">Pending</span>
                                     @endif
                                 </td>
-                                <td>
-                                    <form action="{{ route('booking.destroy', $booking->id) }}" method="post">
+                                {{-- <td>
+                                    <form action="{{ route('bookitem.destroy', $bookitem->id) }}" method="post">
                                         @csrf
                                         @method('DELETE')
-                                        <a href="{{ route('booking.edit', $booking->id) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
+                                        <a href="{{ route('bookitem.edit', $bookitem->id) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
                                         <button type="submit" onclick="return confirm('Apakah anda yakin mengahpus data ini?')" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
                                     </form>
-                                </td>
+                                </td> --}}
                             </tr>
                         @endforeach
                     </tbody>

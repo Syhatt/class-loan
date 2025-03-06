@@ -15,4 +15,14 @@ class Faculty extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function bookingItems()
+    {
+        return $this->hasMany(BookingItem::class);
+    }
+
+    public function bookingClass()
+    {
+        return $this->hasMany(BookingClass::class);
+    }
 }
