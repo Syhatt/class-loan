@@ -6,6 +6,7 @@ use App\Http\Controllers\admin\ItemController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BookingItemController;
 use App\Http\Controllers\MyBookController;
+use App\Http\Controllers\MyBookItemController;
 // use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -63,4 +64,5 @@ Route::middleware(['auth', 'role:user,admin_ruangan'])->group(function(){
     Route::get('mybook', [MyBookController::class, 'index'])->name('mybook');
     Route::resource('bookingitem', BookingItemController::class);
     Route::get('bookingitem/tambah/{id}', [BookingItemController::class, 'create'])->name('bookingitem.tambah');
+    Route::get('mybookitem', [MyBookItemController::class, 'index'])->name('mybookitem');
 });

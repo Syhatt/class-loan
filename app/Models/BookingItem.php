@@ -25,4 +25,14 @@ class BookingItem extends Model
     {
         return $this->belongsTo(Classmodel::class);
     }
+
+    public function faculty()
+    {
+        return $this->belongsTo(Faculty::class);
+    }
+
+    public function bookingClass()
+    {
+        return $this->belongsTo(BookingClass::class);
+    }
 }

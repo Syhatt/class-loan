@@ -66,14 +66,14 @@
 
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('booking.index') }}">
-                        <i class="fas fa-fw fa-map-marked-alt"></i>
+                        <i class="fas fa-fw fa-chalkboard"></i>
                         <span>Pinjam Kelas</span></a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('mybook') }}">
-                        <i class="fas fa-fw fa-bookmark"></i>
-                        <span>Peminjaman Saya</span></a>
+                        <i class="fas fa-fw fa-chalkboard-teacher"></i>
+                        <span>Peminjaman Kelas Saya</span></a>
                 </li>
             @elseif(auth()->user()->role == 'admin_barang')
                 <li class="nav-item">
@@ -84,26 +84,32 @@
 
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('bookingitem.index') }}">
-                        <i class="fas fa-fw fa-search-location"></i>
+                        <i class="fas fa-fw fa-box-open"></i>
                         <span>Pinjam Barang</span></a>
                 </li>
             @elseif(auth()->user()->role == 'user')
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('booking.index') }}">
-                        <i class="fas fa-fw fa-map-marked-alt"></i>
+                        <i class="fas fa-fw fa-chalkboard"></i>
                         <span>Pinjam Kelas</span></a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('mybook') }}">
-                        <i class="fas fa-fw fa-bookmark"></i>
-                        <span>Peminjaman Saya</span></a>
+                        <i class="fas fa-fw fa-chalkboard-teacher"></i>
+                        <span>Peminjaman Kelas Saya</span></a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('bookingitem.index') }}">
-                        <i class="fas fa-fw fa-search-location"></i>
+                        <i class="fas fa-fw fa-box-open"></i>
                         <span>Pinjam Barang</span></a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('mybookitem') }}">
+                        <i class="fas fa-fw fa-box"></i>
+                        <span>Peminjaman Barang Saya</span></a>
                 </li>
                 {{-- @else --}}
             @endif

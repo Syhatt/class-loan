@@ -10,4 +10,9 @@ class Classmodel extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public function bookingClasses()
+    {
+        return $this->hasMany(BookingClass::class);
+    }
 }

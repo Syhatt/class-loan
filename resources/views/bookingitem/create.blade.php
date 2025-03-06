@@ -17,9 +17,9 @@
                     @csrf
                     <div class="form-group">
                         <label>Nama Barang</label>
-                        <input type="text" name="faculty_id" value="{{ $items->faculty_id }}">
+                        <input type="hidden" name="faculty_id" value="{{ $items->faculty_id }}">
                         <input type="text" class="form-control" value="{{ $items->name }}" readonly>
-                        <input type="text" name="item_id" value="{{ $items->id }}">
+                        <input type="hidden" name="item_id" value="{{ $items->id }}">
                         @error('item_id')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
