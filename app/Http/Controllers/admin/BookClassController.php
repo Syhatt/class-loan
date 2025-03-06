@@ -14,7 +14,7 @@ class BookClassController extends Controller
     public function index()
     {
         $pageTitle = 'Data Peminjaman Kelas';
-        $booking = BookingClass::all();
+        $booking = BookingClass::where('faculty_id', auth()->user()->faculty_id)->get();
 
         return view('admin.bookclass.index', compact('pageTitle', 'booking'));
     }

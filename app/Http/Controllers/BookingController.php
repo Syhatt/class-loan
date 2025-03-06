@@ -15,7 +15,7 @@ class BookingController extends Controller
     public function index()
     {
         $pageTitle = 'Peminjaman';
-        $class = Classmodel::all();
+        $class = Classmodel::where('faculty_id', auth()->user()->faculty_id)->where('is_available', true)->get();
 
         return view('booking.index', compact('pageTitle', 'class'));
     }
@@ -81,6 +81,7 @@ class BookingController extends Controller
 
         // dd($request->all());
         BookingClass::create([
+            'faculty_id' => $request->faculty_id,
             'user_id' => auth()->user()->id,
             'classmodel_id' => $request->classmodel_id,
             'start_date' => $request->start_date,
