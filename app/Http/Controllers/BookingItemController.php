@@ -18,7 +18,7 @@ class BookingItemController extends Controller
     public function index()
     {
         $pageTitle = 'Peminjaman Barang';
-        $item = Item::where('stock', '>', 0)->get();
+        $item = Item::where('faculty_id', auth()->user()->faculty_id)->where('stock', '>', 0)->get();
 
         return view('bookingitem.index', compact('pageTitle', 'item'));
     }
@@ -41,36 +41,54 @@ class BookingItemController extends Controller
     {
         $request->validate([
             'item_id' => 'required|exists:items,id',
-            'quantity' => 'required|integer|min:1'
+            'qty' => 'required|integer|min:1'
         ]);
 
-        $user = Auth::user();
-        dd($user);
+        $user = auth()->user();
 
         // Cek apakah user sudah memiliki peminjaman ruangan yang disetujui
         $approvedRoomLoan = BookingClass::where('user_id', $user->id)
             ->where('status', 'approved')
-            ->exists();
+            ->latest()
+            ->first();
 
         if (!$approvedRoomLoan) {
             // return back()->with('error', 'Anda harus memiliki peminjaman ruangan yang disetujui untuk meminjam barang.');
-            alert('gaisok cak');
+            return alert('gaisok cak');
         }
 
         $item = Item::findOrFail($request->item_id);
-
-        if ($request->quantity > $item->stock) {
-            // return back()->with('error', 'Stok barang tidak mencukupi.');
-            alert('Stok barang tidak mencukupi.');
+        if ($item->stock < $request->qty) {
+            return redirect()->back()->with('error', 'Stok barang tidak mencukupi.');
         }
 
+        // Kurangi stok barang
+        $item->stock -= $request->qty;
+        $item->save();
+
         BookingItem::create([
+            'faculty_id' => $request->faculty_id,
             'user_id' => $user->id,
-            'classmodel_id' => BookingClass::where('user_id', $user->id)->where('status', 'approved')->latest()->first()->classmodel_id,
+            'booking_classes_id' => $approvedRoomLoan->id, // Hubungkan dengan peminjaman ruangan
             'item_id' => $request->item_id,
             'qty' => $request->qty,
-            'status' => 'pending'
+            'status' => 'pending',
         ]);
+
+        // $item = Item::findOrFail($request->item_id);
+
+        // if ($request->quantity > $item->stock) {
+        //     // return back()->with('error', 'Stok barang tidak mencukupi.');
+        //     return alert('Stok barang tidak mencukupi.');
+        // }
+
+        // BookingItem::create([
+        //     'user_id' => $user->id,
+        //     'classmodel_id' => BookingClass::where('user_id', $user->id)->where('status', 'approved')->latest()->first()->classmodel_id,
+        //     'item_id' => $request->item_id,
+        //     'qty' => $request->qty,
+        //     'status' => 'pending'
+        // ]);
 
         return redirect()->route('bookingitem.index')->with(['success' => 'Data Berhasil Disimpan!']);
     }

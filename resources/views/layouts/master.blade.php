@@ -99,6 +99,12 @@
                         <i class="fas fa-fw fa-bookmark"></i>
                         <span>Peminjaman Saya</span></a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('bookingitem.index') }}">
+                        <i class="fas fa-fw fa-search-location"></i>
+                        <span>Pinjam Barang</span></a>
+                </li>
                 {{-- @else --}}
             @endif
 
