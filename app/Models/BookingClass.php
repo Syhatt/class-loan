@@ -25,4 +25,9 @@ class BookingClass extends Model
     {
         return $this->belongsTo(Classmodel::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
