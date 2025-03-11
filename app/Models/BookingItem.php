@@ -33,6 +33,6 @@ class BookingItem extends Model
 
     public function bookingClass()
     {
-        return $this->belongsTo(BookingClass::class);
+        return $this->belongsTo(BookingClass::class, 'booking_classes_id');
     }
 }

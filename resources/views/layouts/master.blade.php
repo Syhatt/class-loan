@@ -75,6 +75,12 @@
                         <i class="fas fa-fw fa-chalkboard-teacher"></i>
                         <span>Peminjaman Kelas Saya</span></a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('report.class.index') }}">
+                        <i class="fas fa-fw fa-file-pdf"></i>
+                        <span>Laporan</span></a>
+                </li>
             @elseif(auth()->user()->role == 'admin_barang')
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('item.index') }}">
@@ -92,6 +98,12 @@
                     <a class="nav-link" href="{{ route('bookingitem.index') }}">
                         <i class="fas fa-fw fa-box-open"></i>
                         <span>Pinjam Barang</span></a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('report.item.index') }}">
+                        <i class="fas fa-fw fa-file-pdf"></i>
+                        <span>Laporan</span></a>
                 </li>
             @elseif(auth()->user()->role == 'user')
                 <li class="nav-item">
