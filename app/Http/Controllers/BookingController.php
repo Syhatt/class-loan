@@ -59,25 +59,37 @@ class BookingController extends Controller
         $filePaths = [];
 
         if ($request->hasFile('signature')) {
-            $signature = $request->file('signature');
-            $filename1 = time() . '_1_' . $signature->getClientOriginalName();
-            $signature->move(public_path('uploads'), $filename1);
-            $filePaths['signature'] = 'uploads/' . $filename1;
+            $filePaths['signature'] = $request->file('signature')->store('booking_class', 'public');
         }
-
+    
         if ($request->hasFile('apply_letter')) {
-            $apply_letter = $request->file('apply_letter');
-            $filename2 = time() . '_2_' . $apply_letter->getClientOriginalName();
-            $apply_letter->move(public_path('uploads'), $filename2);
-            $filePaths['apply_letter'] = 'uploads/' . $filename2;
+            $filePaths['apply_letter'] = $request->file('apply_letter')->store('booking_class', 'public');
+        }
+    
+        if ($request->hasFile('activity_proposal')) {
+            $filePaths['activity_proposal'] = $request->file('activity_proposal')->store('booking_class', 'public');
         }
 
-        if ($request->hasFile('activity_proposal')) {
-            $activity_proposal = $request->file('activity_proposal');
-            $filename3 = time() . '_3_' . $activity_proposal->getClientOriginalName();
-            $activity_proposal->move(public_path('uploads'), $filename3);
-            $filePaths['activity_proposal'] = 'uploads/' . $filename3;
-        }
+        // if ($request->hasFile('signature')) {
+        //     $signature = $request->file('signature');
+        //     $filename1 = time() . '_1_' . $signature->getClientOriginalName();
+        //     $signature->move(public_path('uploads'), $filename1);
+        //     $filePaths['signature'] = 'uploads/' . $filename1;
+        // }
+
+        // if ($request->hasFile('apply_letter')) {
+        //     $apply_letter = $request->file('apply_letter');
+        //     $filename2 = time() . '_2_' . $apply_letter->getClientOriginalName();
+        //     $apply_letter->move(public_path('uploads'), $filename2);
+        //     $filePaths['apply_letter'] = 'uploads/' . $filename2;
+        // }
+
+        // if ($request->hasFile('activity_proposal')) {
+        //     $activity_proposal = $request->file('activity_proposal');
+        //     $filename3 = time() . '_3_' . $activity_proposal->getClientOriginalName();
+        //     $activity_proposal->move(public_path('uploads'), $filename3);
+        //     $filePaths['activity_proposal'] = 'uploads/' . $filename3;
+        // }
 
         // dd($request->all());
         BookingClass::create([
@@ -102,7 +114,7 @@ class BookingController extends Controller
             'activity_proposal' => $filePaths['activity_proposal'] ?? null,
         ]);
 
-        return redirect()->route('booking.mybook')->with(['success' => 'Data Berhasil Disimpan!']);
+        return redirect()->route('mybook')->with(['success' => 'Data Berhasil Disimpan!']);
     }
 
     /**

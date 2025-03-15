@@ -86,21 +86,21 @@
                         <td>TTD Yang Mengajukan Kegiatan</td>
                         <td>:</td>
                         <td>
-                            <a href="{{ asset($booking->signature) }}" class="btn btn-primary btn-sm" download>Download File</a>
+                            <a href="{{ asset('storage/' . $booking->signature) }}" class="btn btn-primary btn-sm" download>Download File</a>
                         </td>
                     </tr>
                     <tr>
                         <td>Surat Permohonan Izin Kegiatan</td>
                         <td>:</td>
                         <td>
-                            <a href="{{ asset($booking->apply_letter) }}" class="btn btn-primary btn-sm" download>Download File</a>
+                            <a href="{{ asset('storage/' . $booking->apply_letter) }}" class="btn btn-primary btn-sm" download>Download File</a>
                         </td>
                     </tr>
                     <tr>
                         <td>Proposal Kegiatan</td>
                         <td>:</td>
                         <td>
-                            <a href="{{ asset($booking->activity_proposal) }}" class="btn btn-primary btn-sm" download>Download File</a>
+                            <a href="{{ asset('storage/' . $booking->activity_proposal) }}" class="btn btn-primary btn-sm" download>Download File</a>
                         </td>
                     </tr>
                 </table>
