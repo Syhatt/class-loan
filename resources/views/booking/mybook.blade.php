@@ -5,6 +5,10 @@
         <h1 class="h3 mb-0 text-gray-800">{{ $pageTitle }}</h1>
     </div>
 
+    @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <a href="{{ route('item.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Tambah</a>
@@ -37,9 +41,9 @@
                                 <td>{{ $booking->organization }}</td>
                                 {{-- <td>{{ $booking->status }}</td> --}}
                                 <td>
-                                    @if ($booking->status == "approved")
+                                    @if ($booking->status == 'approved')
                                         <span class="badge badge-success">Approved</span>
-                                    @elseif ($booking->status == "rejected")
+                                    @elseif ($booking->status == 'rejected')
                                         <span class="badge badge-danger">rejected</span>
                                     @else
                                         <span class="badge badge-warning">Pending</span>
@@ -49,8 +53,11 @@
                                     <form action="{{ route('booking.destroy', $booking->id) }}" method="post">
                                         @csrf
                                         @method('DELETE')
-                                        <a href="{{ route('booking.edit', $booking->id) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
-                                        <button type="submit" onclick="return confirm('Apakah anda yakin mengahpus data ini?')" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                                        <a href="{{ route('booking.edit', $booking->id) }}"
+                                            class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
+                                        <button type="submit"
+                                            onclick="return confirm('Apakah anda yakin mengahpus data ini?')"
+                                            class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
                                     </form>
                                 </td>
                             </tr>

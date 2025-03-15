@@ -13,10 +13,11 @@
                     Kembali</a>
             </div>
             <div class="card-body">
-                <form action="{{route('class.store')}}" method="post">
+                <form action="{{ route('class.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="form-group">
                         <label>Nama</label>
+                        <input type="hidden" name="faculty_id" value="{{ $facultyId }}">
                         <input type="text" name="name" class="form-control">
                         @error('name')
                             <div class="text-danger"><small>{{ $message }}</small></div>
@@ -29,17 +30,20 @@
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                         <label>Gambar</label>
                         <input type="text" name="image" class="form-control">
                         @error('image')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
-                    </div>
-                    {{-- <div class="form-group">
+                    </div> --}}
+                    <div class="form-group">
                         <label>Gambar</label>
                         <input type="file" name="image" class="form-control">
-                    </div> --}}
+                        @error('image')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
                     <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Simpan</button>
                 </form>
             </div>

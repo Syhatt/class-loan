@@ -102,7 +102,7 @@ class BookingController extends Controller
             'activity_proposal' => $filePaths['activity_proposal'] ?? null,
         ]);
 
-        return redirect()->route('booking.index')->with(['success' => 'Data Berhasil Disimpan!']);
+        return redirect()->route('booking.mybook')->with(['success' => 'Data Berhasil Disimpan!']);
     }
 
     /**

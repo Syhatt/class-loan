@@ -5,8 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\Classmodel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class ClassController extends Controller
 {
@@ -27,8 +26,9 @@ class ClassController extends Controller
     public function create()
     {
         $pageTitle = 'Tambah Kelas';
+        $facultyId = Auth::user()->faculty_id;
 
-        return view('admin.class.create', compact('pageTitle'));
+        return view('admin.class.create', compact('pageTitle', 'facultyId'));
     }
 
     /**
@@ -37,18 +37,24 @@ class ClassController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'faculty_id' => 'required',
             'name' => 'required',
             'desc' => 'required',
-            'image' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        // Simpan gambar ke storage
+        $filename = time() . '.' . $request->image->extension();
+        $path = $request->file('image')->storeAs('images', $filename, 'public');
 
         Classmodel::create([
+            'faculty_id' => $request->faculty_id,
             'name' => $request->name,
             'desc' => $request->desc,
-            'image' => $request->image,
+            'image' => $path,
         ]);
 
-        return Redirect::back()->with(['success' => 'Success Store!']);
+        return redirect()->route('class.index')->with(['success' => 'Data Berhasil Disimpan!']);
     }
 
     /**
@@ -98,6 +104,6 @@ class ClassController extends Controller
     {
         Classmodel::findOrFail($id)->delete();
 
-        return redirect()->route('class.index')->with(['success' => 'Data Berhasil Diubah!']);
+        return redirect()->route('class.index')->with(['success' => 'Data Berhasil Hapus!']);
     }
 }
