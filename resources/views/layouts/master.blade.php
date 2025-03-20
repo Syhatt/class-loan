@@ -23,6 +23,9 @@
     <!-- Custom styles for this page -->
     <link href="{{ asset('template/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
 
+    {{-- full calendar --}}
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+
 </head>
 
 <body id="page-top">
@@ -45,128 +48,92 @@
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item">
+            <li class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('dashboard') }}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>
 
             @if (auth()->user()->role == 'admin_ruangan')
-                <li class="nav-item">
+                <li class="nav-item {{ request()->is('class.index') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('class.index') }}">
                         <i class="fas fa-fw fa-laptop-house"></i>
                         <span>Kelas</span></a>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item {{ request()->is('bookclass.index') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('bookclass.index') }}">
                         <i class="fas fa-fw fa-table"></i>
                         <span>Data Peminjaman Kelas</span></a>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item {{ request()->is('booking.index') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('booking.index') }}">
                         <i class="fas fa-fw fa-chalkboard"></i>
                         <span>Pinjam Kelas</span></a>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item {{ request()->is('mybook') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('mybook') }}">
                         <i class="fas fa-fw fa-chalkboard-teacher"></i>
                         <span>Peminjaman Kelas Saya</span></a>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item {{ request()->is('report.class.index') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('report.class.index') }}">
                         <i class="fas fa-fw fa-file-pdf"></i>
                         <span>Laporan</span></a>
                 </li>
             @elseif(auth()->user()->role == 'admin_barang')
-                <li class="nav-item">
+                <li class="nav-item {{ request()->is('item') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('item.index') }}">
                         <i class="fas fa-fw fa-toolbox"></i>
                         <span>Barang</span></a>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item {{ request()->is('bookitem') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('bookitem.index') }}">
                         <i class="fas fa-fw fa-table"></i>
                         <span>Data Peminjaman Barang</span></a>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item {{ request()->is('bookitem.index') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('bookingitem.index') }}">
                         <i class="fas fa-fw fa-box-open"></i>
                         <span>Pinjam Barang</span></a>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item {{ request()->is('report.item.index') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('report.item.index') }}">
                         <i class="fas fa-fw fa-file-pdf"></i>
                         <span>Laporan</span></a>
                 </li>
             @elseif(auth()->user()->role == 'user')
-                <li class="nav-item">
+                <li class="nav-item {{ request()->is('booking') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('booking.index') }}">
                         <i class="fas fa-fw fa-chalkboard"></i>
                         <span>Pinjam Kelas</span></a>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item {{ request()->is('mybook') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('mybook') }}">
                         <i class="fas fa-fw fa-chalkboard-teacher"></i>
                         <span>Peminjaman Kelas Saya</span></a>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item {{ request()->is('bookingitem') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('bookingitem.index') }}">
                         <i class="fas fa-fw fa-box-open"></i>
                         <span>Pinjam Barang</span></a>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item {{ request()->is('mybookitem') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('mybookitem') }}">
                         <i class="fas fa-fw fa-box"></i>
                         <span>Peminjaman Barang Saya</span></a>
                 </li>
                 {{-- @else --}}
             @endif
-
-            {{-- <li class="nav-item">
-                <a class="nav-link" href="{{ route('class.index') }}">
-                    <i class="fas fa-fw fa-laptop-house"></i>
-                    <span>Kelas</span></a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('booking.index') }}">
-                    <i class="fas fa-fw fa-map-marked-alt"></i>
-                    <span>Pinjam Kelas</span></a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('mybook') }}">
-                    <i class="fas fa-fw fa-bookmark"></i>
-                    <span>Peminjaman Saya</span></a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('bookclass.index') }}">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Data Peminjaman Kelas</span></a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('item.index') }}">
-                    <i class="fas fa-fw fa-toolbox"></i>
-                    <span>Barang</span></a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('bookingitem.index') }}">
-                    <i class="fas fa-fw fa-search-location"></i>
-                    <span>Pinjam Barang</span></a>
-            </li> --}}
 
             <!-- Divider -->
             <hr class="sidebar-divider">
@@ -249,7 +216,7 @@
                                     Activity Log
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                
+
                                 <div class="text-center">
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
@@ -333,6 +300,11 @@
 
     <!-- Page level custom scripts -->
     <script src="{{ asset('template/js/demo/datatables-demo.js') }}"></script>
+
+    {{-- full calendar --}}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/id.js"></script>
+    @stack('script')
 
 </body>
 
