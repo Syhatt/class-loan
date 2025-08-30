@@ -86,21 +86,24 @@
                         <td>TTD Yang Mengajukan Kegiatan</td>
                         <td>:</td>
                         <td>
-                            <a href="{{ asset('storage/' . $booking->signature) }}" class="btn btn-primary btn-sm" download>Download File</a>
+                            <a href="{{ asset('storage/' . $booking->signature) }}" class="btn btn-primary btn-sm"
+                                download>Download File</a>
                         </td>
                     </tr>
                     <tr>
                         <td>Surat Permohonan Izin Kegiatan</td>
                         <td>:</td>
                         <td>
-                            <a href="{{ asset('storage/' . $booking->apply_letter) }}" class="btn btn-primary btn-sm" download>Download File</a>
+                            <a href="{{ asset('storage/' . $booking->apply_letter) }}" class="btn btn-primary btn-sm"
+                                download>Download File</a>
                         </td>
                     </tr>
                     <tr>
                         <td>Proposal Kegiatan</td>
                         <td>:</td>
                         <td>
-                            <a href="{{ asset('storage/' . $booking->activity_proposal) }}" class="btn btn-primary btn-sm" download>Download File</a>
+                            <a href="{{ asset('storage/' . $booking->activity_proposal) }}" class="btn btn-primary btn-sm"
+                                download>Download File</a>
                         </td>
                     </tr>
                 </table>
@@ -108,11 +111,16 @@
                 <div class="container text-center">
                     <div class="row">
                         <div class="col">
-                            <form action="{{ route('bookclass.update', $booking->id) }}" method="POST">
+                            <form action="{{ route('bookclass.update', $booking->id) }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
                                 <input type="hidden" name="status" value="approved">
-                                <button type="submit" class="btn btn-success btn-sm"><i class="far fa-check-circle"></i> Approve</button>
+                                <button type="submit" class="btn btn-success btn-sm"><i class="far fa-check-circle"></i>
+                                    Approve</button>
+
+                                <div class="form-group mt-2">
+                                    <input type="file" name="nodin" class="form-control">
+                                </div>
                             </form>
                         </div>
                         <div class="col">
@@ -120,7 +128,8 @@
                                 @csrf
                                 @method('PUT')
                                 <input type="hidden" name="status" value="rejected">
-                                <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-times-circle"></i> Reject</button>
+                                <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-times-circle"></i>
+                                    Reject</button>
                             </form>
                         </div>
                     </div>

@@ -26,6 +26,7 @@
                             <th>Keperluan</th>
                             <th>Jaminan</th>
                             <th>Status</th>
+                            <th>Nodin</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -45,6 +46,15 @@
                                         <span class="badge badge-danger">rejected</span>
                                     @else
                                         <span class="badge badge-warning">Pending</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($booking->nodin)
+                                        <a href="{{ asset($booking->nodin) }}" class="btn btn-primary btn-sm" download>
+                                            Download Nota Dinas
+                                        </a>
+                                    @else
+                                        <span class="text-muted">Belum tersedia</span>
                                     @endif
                                 </td>
                             </tr>
