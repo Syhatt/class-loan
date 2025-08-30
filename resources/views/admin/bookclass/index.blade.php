@@ -28,7 +28,7 @@
                         @foreach ($booking as $booking)
                             <tr class="text-center">
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $booking->classmodel_id }}</td>
+                                <td>{{ $booking->classmodel->name }}</td>
                                 <td>{{ $booking->start_date }}</td>
                                 <td>{{ $booking->start_time }}</td>
                                 <td>{{ $booking->activity_name }}</td>

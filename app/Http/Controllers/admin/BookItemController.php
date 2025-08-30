@@ -40,7 +40,12 @@ class BookItemController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $pageTitle = 'Detail Peminjaman Barang';
+
+        $booking = BookingItem::with(['item', 'user', 'bookingClass'])
+            ->findOrFail($id);
+
+        return view('admin.bookitem.show', compact('pageTitle', 'booking'));
     }
 
     /**
@@ -60,11 +65,18 @@ class BookItemController extends Controller
 
         $request->validate([
             'status' => 'required|in:approved,rejected',
+            'nodin_barang' => 'nullable|file|mimes:pdf,doc,docx|max:2048'
         ]);
 
-        $booking->update([
-            'status' => $request->status
-        ]);
+        $data = ['status' => $request->status];
+
+        if ($request->hasFile('nodin_barang')) {
+            $filename = time() . '_' . $request->file('nodin_barang')->getClientOriginalName();
+            $request->file('nodin_barang')->move(public_path('uploads/nodin_barang'), $filename);
+            $data['nodin_barang'] = $filename;
+        }
+
+        $booking->update($data);
 
         return redirect()->route('bookitem.index')->with(['success' => 'Data Berhasil Diubah!']);
     }

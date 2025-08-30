@@ -16,6 +16,21 @@
                 <form action="{{ route('bookingitem.store') }}" method="post">
                     @csrf
                     <div class="form-group">
+                        <label>Pilih Ruangan / Acara</label>
+                        <select name="booking_class_id" class="form-control" required>
+                            <option value="">-- Pilih Ruangan --</option>
+                            @foreach ($approvedRooms as $room)
+                                <option value="{{ $room->id }}">
+                                    {{ $room->activity_name }} - {{ $room->classmodel->name }} ({{ $room->start_date }} s/d
+                                    {{ $room->end_date }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('booking_class_id')
+                            <div class="text-danger"><small>{{ $message }}</small></div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
                         <label>Nama Barang</label>
                         <input type="hidden" name="faculty_id" value="{{ $items->faculty_id }}">
                         <input type="text" class="form-control" value="{{ $items->name }}" readonly>

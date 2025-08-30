@@ -15,7 +15,7 @@
                     <tr>
                         <td>Kelas</td>
                         <td>:</td>
-                        <td>{{ $booking->classmodel_id }}</td>
+                        <td>{{ $booking->classmodel->name }}</td>
                     </tr>
                     <tr>
                         <td>Tanggal Mulai Kegiatan</td>
