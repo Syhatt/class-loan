@@ -34,9 +34,9 @@
                                 <td>{{ $bookitem->item->name }}</td>
                                 <td>{{ $bookitem->qty }}</td>
                                 <td>
-                                    @if ($bookitem->status == "approved")
+                                    @if ($bookitem->status == 'approved')
                                         <span class="badge badge-success">Approved</span>
-                                    @elseif ($bookitem->status == "rejected")
+                                    @elseif ($bookitem->status == 'rejected')
                                         <span class="badge badge-danger">rejected</span>
                                     @else
                                         <span class="badge badge-warning">Pending</span>

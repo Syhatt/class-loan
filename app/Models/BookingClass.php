@@ -30,4 +30,9 @@ class BookingClass extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function nodin()
+    {
+        return $this->hasOne(Nodin::class);
+    }
 }

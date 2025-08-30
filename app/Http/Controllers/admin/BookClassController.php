@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BookingClass;
+use App\Models\Nodin;
 use Illuminate\Http\Request;
 
 class BookClassController extends Controller
@@ -63,11 +64,26 @@ class BookClassController extends Controller
 
         $request->validate([
             'status' => 'required|in:approved,rejected',
+            'nodin' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
+        // ubah status booking
         $booking->update([
-            'status' => $request->status
+            'status' => 'approved',
         ]);
+
+        // simpan nodin ke tabel nodins
+        if ($request->hasFile('nodin')) {
+            $file = $request->file('nodin');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/nodin'), $filename);
+
+            // dd($filename);
+            Nodin::create([
+                'booking_class_id' => $booking->id,
+                'file_path' => 'uploads/nodin/' . $filename,
+            ]);
+        }
 
         return redirect()->route('bookclass.index')->with(['success' => 'Data Berhasil Diubah!']);
     }
