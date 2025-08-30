@@ -26,6 +26,9 @@ class UserSeeder extends Seeder
                 'name' => 'Super Barang',
                 'email' => 'adminbarang1@gmail.com',
                 'password' => Hash::make('12345678'),
+                'nim' => '1204210092',
+                'study_program_id' => 1,
+                'semester' => '4',
                 'role' => 'admin_barang'
             ],
             [
@@ -33,6 +36,9 @@ class UserSeeder extends Seeder
                 'name' => 'Super Ruangan',
                 'email' => 'adminruangan1@gmail.com',
                 'password' => Hash::make('12345678'),
+                'nim' => '1204210034',
+                'study_program_id' => 1,
+                'semester' => '4',
                 'role' => 'admin_ruangan'
             ],
             [
@@ -40,6 +46,9 @@ class UserSeeder extends Seeder
                 'name' => 'User',
                 'email' => 'user1@gmail.com',
                 'password' => Hash::make('12345678'),
+                'nim' => '1204210020',
+                'study_program_id' => 1,
+                'semester' => '4',
                 'role' => 'user'
             ],
             [
@@ -47,6 +56,9 @@ class UserSeeder extends Seeder
                 'name' => 'Super Barang',
                 'email' => 'adminbarang2@gmail.com',
                 'password' => Hash::make('12345678'),
+                'nim' => '120421987',
+                'study_program_id' => 2,
+                'semester' => '4',
                 'role' => 'admin_barang'
             ],
             [
@@ -54,6 +66,9 @@ class UserSeeder extends Seeder
                 'name' => 'Super Ruangan',
                 'email' => 'adminruangan2@gmail.com',
                 'password' => Hash::make('12345678'),
+                'nim' => '1204210245',
+                'study_program_id' => 2,
+                'semester' => '4',
                 'role' => 'admin_ruangan'
             ],
             [
@@ -61,6 +76,9 @@ class UserSeeder extends Seeder
                 'name' => 'User',
                 'email' => 'user2@gmail.com',
                 'password' => Hash::make('12345678'),
+                'nim' => '1204210642',
+                'study_program_id' => 2,
+                'semester' => '4',
                 'role' => 'user'
             ],
         ]);

@@ -71,28 +71,28 @@
                         </div>
                         <div class="form-group">
                             <label>Nama Lengkap Mahasiswa</label>
-                            <input type="text" name="full_name" class="form-control" value="{{ old('full_name') }}">
+                            <input type="text" name="full_name" class="form-control" value="{{ auth()->user()->name }}" readonly>
                             @error('full_name')
                                 <div class="text-danger"><small>{{ $message }}</small></div>
                             @enderror
                         </div>
                         <div class="form-group">
                             <label>NIM</label>
-                            <input type="text" name="nim" class="form-control" value="{{ old('nim') }}">
+                            <input type="text" name="nim" class="form-control" value="{{ auth()->user()->nim }}" readonly>
                             @error('nim')
                                 <div class="text-danger"><small>{{ $message }}</small></div>
                             @enderror
                         </div>
                         <div class="form-group">
                             <label>Semester</label>
-                            <input type="text" name="semester" class="form-control" value="{{ old('semester') }}">
+                            <input type="text" name="semester" class="form-control" value="{{ auth()->user()->semester }}" readonly>
                             @error('semester')
                                 <div class="text-danger"><small>{{ $message }}</small></div>
                             @enderror
                         </div>
                         <div class="form-group">
                             <label>Prodi</label>
-                            <input type="text" name="prodi" class="form-control" value="{{ old('prodi') }}">
+                            <input type="text" name="prodi" class="form-control" value="{{ auth()->user()->studyProgram->name }}" readonly>
                             @error('prodi')
                                 <div class="text-danger"><small>{{ $message }}</small></div>
                             @enderror

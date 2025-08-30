@@ -26,11 +26,13 @@
                     </thead>
                     <tbody>
                         @foreach ($bookitem as $bookitem)
+                        {{-- mengambil value dari class --}}
+                        {{-- dd($bookitem->bookingClass->classmodel->name) --}}
                             <tr class="text-center">
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $bookitem->faculty->name }}</td>
                                 <td>{{ $bookitem->user->name }}</td>
-                                <td>{{ $bookitem->booking_classes_id }}</td>
+                                <td>{{ $bookitem->bookingClass->classmodel->name }}</td>
                                 <td>{{ $bookitem->item->name }}</td>
                                 <td>{{ $bookitem->qty }}</td>
                                 <td>

@@ -15,4 +15,9 @@ class Classmodel extends Model
     {
         return $this->hasMany(BookingClass::class);
     }
+
+    public function bookingItem()
+    {
+        return $this->belongsTo(BookingItem::class);
+    }
 }

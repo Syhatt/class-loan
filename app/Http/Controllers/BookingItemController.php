@@ -31,7 +31,12 @@ class BookingItemController extends Controller
         $pageTitle = 'Form Peminjaman Barang';
         $items = Item::findOrFail($id);
 
-        return view('bookingitem.create', compact('pageTitle', 'items'));
+        // ambil semua peminjaman ruangan yg sudah approved milik mahasiswa ini
+        $approvedRooms = BookingClass::where('user_id', auth()->id())
+            ->where('status', 'approved')
+            ->get();
+
+        return view('bookingitem.create', compact('pageTitle', 'items', 'approvedRooms'));
     }
 
     /**
@@ -41,15 +46,16 @@ class BookingItemController extends Controller
     {
         $request->validate([
             'item_id' => 'required|exists:items,id',
-            'qty' => 'required|integer|min:1'
+            'qty' => 'required|integer|min:1',
+            'booking_class_id' => 'required|exists:booking_classes,id'
         ]);
 
         $user = auth()->user();
 
-        // Cek apakah user sudah memiliki peminjaman ruangan yang disetujui
-        $approvedRoomLoan = BookingClass::where('user_id', $user->id)
+        // cek apakah booking_class_id milik user & sudah approved
+        $approvedRoomLoan = BookingClass::where('id', $request->booking_class_id)
+            ->where('user_id', $user->id)
             ->where('status', 'approved')
-            ->latest()
             ->first();
 
         if (!$approvedRoomLoan) {
@@ -69,26 +75,11 @@ class BookingItemController extends Controller
         BookingItem::create([
             'faculty_id' => $request->faculty_id,
             'user_id' => $user->id,
-            'booking_classes_id' => $approvedRoomLoan->id, // Hubungkan dengan peminjaman ruangan
+            'booking_classes_id' => $approvedRoomLoan->id,
             'item_id' => $request->item_id,
             'qty' => $request->qty,
             'status' => 'pending',
         ]);
-
-        // $item = Item::findOrFail($request->item_id);
-
-        // if ($request->quantity > $item->stock) {
-        //     // return back()->with('error', 'Stok barang tidak mencukupi.');
-        //     return alert('Stok barang tidak mencukupi.');
-        // }
-
-        // BookingItem::create([
-        //     'user_id' => $user->id,
-        //     'classmodel_id' => BookingClass::where('user_id', $user->id)->where('status', 'approved')->latest()->first()->classmodel_id,
-        //     'item_id' => $request->item_id,
-        //     'qty' => $request->qty,
-        //     'status' => 'pending'
-        // ]);
 
         return redirect()->route('bookingitem.index')->with(['success' => 'Data Berhasil Disimpan!']);
     }
