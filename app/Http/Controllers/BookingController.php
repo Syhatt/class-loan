@@ -61,35 +61,46 @@ class BookingController extends Controller
         if ($request->hasFile('signature')) {
             $filePaths['signature'] = $request->file('signature')->store('booking_class', 'public');
         }
-    
+
         if ($request->hasFile('apply_letter')) {
             $filePaths['apply_letter'] = $request->file('apply_letter')->store('booking_class', 'public');
         }
-    
+
         if ($request->hasFile('activity_proposal')) {
             $filePaths['activity_proposal'] = $request->file('activity_proposal')->store('booking_class', 'public');
         }
 
-        // if ($request->hasFile('signature')) {
-        //     $signature = $request->file('signature');
-        //     $filename1 = time() . '_1_' . $signature->getClientOriginalName();
-        //     $signature->move(public_path('uploads'), $filename1);
-        //     $filePaths['signature'] = 'uploads/' . $filename1;
-        // }
+        $user = auth()->user();
 
-        // if ($request->hasFile('apply_letter')) {
-        //     $apply_letter = $request->file('apply_letter');
-        //     $filename2 = time() . '_2_' . $apply_letter->getClientOriginalName();
-        //     $apply_letter->move(public_path('uploads'), $filename2);
-        //     $filePaths['apply_letter'] = 'uploads/' . $filename2;
-        // }
+        // --- PRIORITAS ROLE ---
+        $rolePriority = [
+            'superadmin' => 1,
+            'admin_ruangan' => 2,
+            'admin_barang' => 2,
+            'dosen' => 3,
+            'user' => 4,
+        ];
 
-        // if ($request->hasFile('activity_proposal')) {
-        //     $activity_proposal = $request->file('activity_proposal');
-        //     $filename3 = time() . '_3_' . $activity_proposal->getClientOriginalName();
-        //     $activity_proposal->move(public_path('uploads'), $filename3);
-        //     $filePaths['activity_proposal'] = 'uploads/' . $filename3;
-        // }
+        $currentPriority = $rolePriority[$user->role] ?? 5;
+
+        // --- CEK BOOKING YANG OVERLAP ---
+        $overlaps = BookingClass::where('classmodel_id', $request->classmodel_id)
+            ->where(function ($query) use ($request) {
+                $query->whereBetween('start_time', [$request->start_time, $request->end_time])
+                    ->orWhereBetween('end_time', [$request->start_time, $request->end_time]);
+            })
+            ->whereDate('start_date', $request->start_date)
+            ->get();
+
+        // Kalau ada bentrok
+        foreach ($overlaps as $booking) {
+            $bookerPriority = $rolePriority[$booking->user->role] ?? 5;
+
+            if ($bookerPriority <= $currentPriority) {
+                // Ada booking dengan prioritas lebih tinggi atau sama → tolak
+                return redirect()->back()->with(['error' => 'Booking gagal, ruangan sudah dipakai oleh user dengan prioritas lebih tinggi.']);
+            }
+        }
 
         // dd($request->all());
         BookingClass::create([

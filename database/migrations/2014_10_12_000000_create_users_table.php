@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['superadmin', 'admin_ruangan', 'admin_barang', 'user'])->default('user');
+            $table->enum('role', ['superadmin', 'admin_ruangan', 'admin_barang', 'user', 'dosen'])->default('user');
             $table->string('nim');
             $table->string('semester');
             $table->foreignId('study_program_id')->constrained();
