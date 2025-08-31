@@ -6,6 +6,7 @@ use App\Http\Controllers\admin\ClassController;
 use App\Http\Controllers\admin\ItemController;
 use App\Http\Controllers\admin\ReportClassController;
 use App\Http\Controllers\admin\ReportItemController;
+use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BookingItemController;
 use App\Http\Controllers\DashboardController;
@@ -61,4 +62,8 @@ Route::middleware(['auth', 'role:user,dosen,admin_ruangan,admin_barang'])->group
     Route::resource('bookingitem', BookingItemController::class);
     Route::get('bookingitem/tambah/{id}', [BookingItemController::class, 'create'])->name('bookingitem.tambah');
     Route::get('mybookitem', [MyBookItemController::class, 'index'])->name('mybookitem');
+});
+
+Route::middleware(['auth', 'role:superadmin'])->group(function () {
+    Route::resource('user', UserController::class);
 });

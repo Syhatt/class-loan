@@ -30,13 +30,6 @@
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>
-                    {{-- <div class="form-group">
-                        <label>Gambar</label>
-                        <input type="text" name="image" class="form-control">
-                        @error('image')
-                            <div class="text-danger"><small>{{ $message }}</small></div>
-                        @enderror
-                    </div> --}}
                     <div class="form-group">
                         <label>Gambar</label>
                         <input type="file" name="image" class="form-control">
