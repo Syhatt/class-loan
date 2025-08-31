@@ -1,0 +1,25 @@
+@extends('layouts.master')
+@section('content')
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{{ $pageTitle }}</h1>
+    </div>
+
+    <!-- Basic Card Example -->
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <a href="{{ route('user.index') }}" class="btn btn-danger btn-sm"><i class="fas fa-arrow-left"></i>
+                    Kembali</a>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('user.update', $user->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('put')
+                    @include('admin.user.form')
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Simpan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+@endsection
