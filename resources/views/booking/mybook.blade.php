@@ -11,7 +11,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <a href="{{ route('item.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Tambah</a>
+            {{-- <a href="{{ route('item.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Tambah</a> --}}
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -50,7 +50,7 @@
                                 </td>
                                 <td>
                                     @if ($booking->nodin)
-                                        <a href="{{ asset($booking->nodin) }}" class="btn btn-primary btn-sm" download>
+                                        <a href="{{ asset($booking->nodin->file_path) }}" class="btn btn-primary btn-sm" download>
                                             Download Nota Dinas
                                         </a>
                                     @else

@@ -42,12 +42,13 @@ Route::middleware(['auth', 'role:admin_barang'])->group(function () {
     Route::resource('bookitem', BookItemController::class);
     Route::resource('bookingitem', BookingItemController::class);
     Route::get('bookingitem/tambah/{id}', [BookingItemController::class, 'create'])->name('bookingitem.tambah');
+    Route::get('mybookitem', [MyBookItemController::class, 'index'])->name('mybookitem');
     Route::get('/reports/item', [ReportItemController::class, 'index'])->name('report.item.index');
     Route::get('/reports/item/generate', [ReportItemController::class, 'generate'])->name('report.item.generate');
     Route::get('/reports/item/download', [ReportItemController::class, 'download'])->name('report.item.download');
 });
 
-Route::middleware(['auth', 'role:user,admin_ruangan,admin_barang'])->group(function () {
+Route::middleware(['auth', 'role:user,dosen,admin_ruangan,admin_barang'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/databooking', [DashboardController::class, 'databooking'])->name('bookings.data');
 

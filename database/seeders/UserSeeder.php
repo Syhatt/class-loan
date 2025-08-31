@@ -15,12 +15,36 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         DB::table('users')->insert([
-            // [
-            //     'name' => 'Super Admin',
-            //     'email' => 'superadmin@gmail.com',
-            //     'password' => Hash::make('12345678'),
-            //     'role' => 'superadmin'
-            // ],
+            [
+                'faculty_id' => 1,
+                'name' => 'Super Admin',
+                'email' => 'superadmin@gmail.com',
+                'password' => Hash::make('12345678'),
+                'nim' => '1204210092',
+                'study_program_id' => 1,
+                'semester' => '4',
+                'role' => 'superadmin'
+            ],
+            [
+                'faculty_id' => 1,
+                'name' => 'Dosen Teknik',
+                'email' => 'dosenteknik@gmail.com',
+                'password' => Hash::make('12345678'),
+                'nim' => '1204210023',
+                'study_program_id' => 3,
+                'semester' => '4',
+                'role' => 'dosen'
+            ],
+            [
+                'faculty_id' => 2,
+                'name' => 'Dosen FEB',
+                'email' => 'dosenfeb@gmail.com',
+                'password' => Hash::make('12345678'),
+                'nim' => '1204210679',
+                'study_program_id' => 5,
+                'semester' => '4',
+                'role' => 'dosen'
+            ],
             [
                 'faculty_id' => 1,
                 'name' => 'Super Barang',

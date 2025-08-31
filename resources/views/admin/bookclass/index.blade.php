@@ -7,7 +7,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <a href="{{ route('bookclass.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Tambah</a>
+            {{-- <a href="{{ route('bookclass.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Tambah</a> --}}
         </div>
         <div class="card-body">
             <div class="table-responsive">

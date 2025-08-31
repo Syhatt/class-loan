@@ -7,7 +7,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <a href="{{ route('item.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Tambah</a>
+            {{-- <a href="{{ route('item.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Tambah</a> --}}
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -21,7 +21,7 @@
                             <th>Barang</th>
                             <th>Jumlah</th>
                             <th>Status</th>
-                            {{-- <th>Action</th> --}}
+                            <th>Nodin</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,14 +44,15 @@
                                         <span class="badge badge-warning">Pending</span>
                                     @endif
                                 </td>
-                                {{-- <td>
-                                    <form action="{{ route('bookitem.destroy', $bookitem->id) }}" method="post">
-                                        @csrf
-                                        @method('DELETE')
-                                        <a href="{{ route('bookitem.edit', $bookitem->id) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
-                                        <button type="submit" onclick="return confirm('Apakah anda yakin mengahpus data ini?')" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                                    </form>
-                                </td> --}}
+                                <td>
+                                    @if ($bookitem->nodin_barang)
+                                        <a href="{{ asset('uploads/nodin_barang/' . $bookitem->nodin_barang) }}" class="btn btn-primary btn-sm" download>
+                                            Download Nota Dinas
+                                        </a>
+                                    @else
+                                        <span class="text-muted">Belum tersedia</span>
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

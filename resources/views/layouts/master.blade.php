@@ -84,6 +84,12 @@
                         <i class="fas fa-fw fa-file-pdf"></i>
                         <span>Laporan</span></a>
                 </li>
+
+                {{-- <li class="nav-item {{ request()->is('report.class.index') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('report.class.index') }}">
+                        <i class="fas fa-fw fa-file-pdf"></i>
+                        <span>Laporan</span></a> --}}
+                </li>
             @elseif(auth()->user()->role == 'admin_barang')
                 <li class="nav-item {{ request()->is('item') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('item.index') }}">
@@ -103,12 +109,18 @@
                         <span>Pinjam Barang</span></a>
                 </li>
 
+                <li class="nav-item {{ request()->is('mybookitem') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('mybookitem') }}">
+                        <i class="fas fa-fw fa-box"></i>
+                        <span>Peminjaman Barang Saya</span></a>
+                </li>
+
                 <li class="nav-item {{ request()->is('report.item.index') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('report.item.index') }}">
                         <i class="fas fa-fw fa-file-pdf"></i>
                         <span>Laporan</span></a>
                 </li>
-            @elseif(auth()->user()->role == 'user')
+            @elseif(auth()->user()->role == 'user' || auth()->user()->role == 'dosen')
                 <li class="nav-item {{ request()->is('booking') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('booking.index') }}">
                         <i class="fas fa-fw fa-chalkboard"></i>

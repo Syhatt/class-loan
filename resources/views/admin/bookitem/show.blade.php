@@ -5,7 +5,7 @@
         <h1 class="h3 mb-0 text-gray-800">{{ $pageTitle }}</h1>
     </div>
 
-    <a href="{{ route('bookclass.index') }}" class="btn btn-danger btn-sm mb-3"><i class="fas fa-arrow-left"></i>
+    <a href="{{ route('bookitem.index') }}" class="btn btn-danger btn-sm mb-3"><i class="fas fa-arrow-left"></i>
         Kembali</a>
 
     <div class="card shadow mb-4">
@@ -48,7 +48,7 @@
                     <th>Nodin Peminjaman Ruangan</th>
                     <td>
                         @if ($booking->bookingClass->nodin)
-                            <a href="{{ asset('uploads/nodin_ruangan/' . $booking->bookingClass->nodin) }}" target="_blank"
+                            <a href="{{ asset($booking->bookingClass->nodin->file_path) }}" target="_blank"
                                 class="btn btn-sm btn-primary">Download</a>
                         @else
                             <span class="text-danger">Belum ada</span>
