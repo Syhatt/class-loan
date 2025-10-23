@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BookingClass;
 use App\Models\Classmodel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -38,10 +39,8 @@ class BookingController extends Controller
     {
         $request->validate([
             'classmodel_id' => 'required',
-            'start_date' => 'required',
-            'end_date' => 'required',
-            'start_time' => 'required',
-            'end_time' => 'required',
+            'start_datetime' => 'required|date',
+            'end_datetime' => 'required|date|after:start_datetime',
             'organization' => 'required',
             'activity_name' => 'required',
             'full_name' => 'required',
@@ -51,16 +50,11 @@ class BookingController extends Controller
             'telp' => 'required',
             'no_letter' => 'required',
             'date_letter' => 'required',
-            'signature' => 'required|file|max:2048',
             'apply_letter' => 'required|file|max:2048',
             'activity_proposal' => 'required|file|max:2048',
         ]);
 
         $filePaths = [];
-
-        if ($request->hasFile('signature')) {
-            $filePaths['signature'] = $request->file('signature')->store('booking_class', 'public');
-        }
 
         if ($request->hasFile('apply_letter')) {
             $filePaths['apply_letter'] = $request->file('apply_letter')->store('booking_class', 'public');
@@ -107,10 +101,10 @@ class BookingController extends Controller
             'faculty_id' => $request->faculty_id,
             'user_id' => auth()->user()->id,
             'classmodel_id' => $request->classmodel_id,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
+            'start_date' => Carbon::parse($request->start_datetime)->toDateString(),
+            'end_date' => Carbon::parse($request->end_datetime)->toDateString(),
+            'start_time' => Carbon::parse($request->start_datetime)->format('H:i'),
+            'end_time' => Carbon::parse($request->end_datetime)->format('H:i'),
             'organization' => $request->organization,
             'activity_name' => $request->activity_name,
             'full_name' => $request->full_name,
@@ -120,7 +114,6 @@ class BookingController extends Controller
             'telp' => $request->telp,
             'no_letter' => $request->no_letter,
             'date_letter' => $request->date_letter,
-            'signature' => $filePaths['signature'] ?? null,
             'apply_letter' => $filePaths['apply_letter'] ?? null,
             'activity_proposal' => $filePaths['activity_proposal'] ?? null,
         ]);
