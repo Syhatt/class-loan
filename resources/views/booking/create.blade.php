@@ -13,9 +13,21 @@
                     <a href="{{ route('booking.index') }}" class="btn btn-danger btn-sm"><i class="fas fa-arrow-left"></i>
                         Kembali</a>
                 </div>
+
+                {{-- @if (session('error'))
+                    <div class="alert alert-danger">{{ session('error') }}</div>
+                @endif
+                @if (session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif --}}
+
                 <div class="card-body">
                     <form action="{{ route('booking.store') }}" method="post" enctype="multipart/form-data">
                         @csrf
+                        @if (session('error'))
+                            <div class="alert alert-danger">{{ session('error') }}</div>
+                        @endif
+
                         <div class="form-group">
                             <label>Kelas</label>
                             <input type="hidden" name="faculty_id" value="{{ $class->faculty_id }}">

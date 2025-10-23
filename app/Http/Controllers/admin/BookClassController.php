@@ -94,33 +94,6 @@ class BookClassController extends Controller
         }
 
         return redirect()->route('bookclass.index')->with(['success' => 'Data berhasil diperbarui!']);
-
-        // $booking = BookingClass::findOrFail($id);
-
-        // $request->validate([
-        //     'status' => 'required|in:approved,rejected',
-        //     'nodin' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
-        // ]);
-
-        // // ubah status booking
-        // $booking->update([
-        //     'status' => 'approved',
-        // ]);
-
-        // // simpan nodin ke tabel nodins
-        // if ($request->hasFile('nodin')) {
-        //     $file = $request->file('nodin');
-        //     $filename = time() . '_' . $file->getClientOriginalName();
-        //     $file->move(public_path('uploads/nodin'), $filename);
-
-        //     // dd($filename);
-        //     Nodin::create([
-        //         'booking_class_id' => $booking->id,
-        //         'file_path' => 'uploads/nodin/' . $filename,
-        //     ]);
-        // }
-
-        // return redirect()->route('bookclass.index')->with(['success' => 'Data Berhasil Diubah!']);
     }
 
     /**
