@@ -16,17 +16,21 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        // if (Auth::check() && Auth::user()->role === $role) {
-        //     return $next($request);
-        // }
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
 
-        // ini codingan untuk biar bisa akses admin sama user bagian booking (bisa akses 2 role)
-        if (!Auth::check() || !in_array(Auth::user()->role, $roles)) {
+        $userRole = Auth::user()->role;
+
+        // Map role lama ke role baru
+        if (in_array($userRole, ['admin_ruangan', 'admin_barang'])) {
+            $userRole = 'admin_fakultas';
+        }
+
+        if (!in_array($userRole, $roles)) {
             abort(403, 'Unauthorized action.');
         }
-        return $next($request);
 
-        // return $next($request);
-        return redirect('/')->with('error', 'Anda tidak memiliki akses ke halaman ini.');
+        return $next($request);
     }
 }

@@ -14,96 +14,105 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // DB::table('users')->truncate(); // optional: biar data lama bersih
+
         DB::table('users')->insert([
+            // === SUPER ADMIN ===
             [
                 'faculty_id' => 1,
+                'study_program_id' => 1,
                 'name' => 'Super Admin',
                 'email' => 'superadmin@gmail.com',
                 'password' => Hash::make('12345678'),
-                'nim' => '1204210092',
-                'study_program_id' => 1,
+                'nim' => '0000000001',
                 'semester' => '4',
-                'role' => 'superadmin'
+                'role' => 'superadmin',
             ],
+
+            // === DOSEN ===
             [
                 'faculty_id' => 1,
+                'study_program_id' => 1,
                 'name' => 'Dosen Teknik',
                 'email' => 'dosenteknik@gmail.com',
                 'password' => Hash::make('12345678'),
-                'nim' => '1204210023',
-                'study_program_id' => 3,
+                'nim' => '0000001001',
                 'semester' => '4',
-                'role' => 'dosen'
+                'role' => 'dosen',
             ],
             [
                 'faculty_id' => 2,
+                'study_program_id' => 4,
                 'name' => 'Dosen FEB',
                 'email' => 'dosenfeb@gmail.com',
                 'password' => Hash::make('12345678'),
-                'nim' => '1204210679',
-                'study_program_id' => 5,
+                'nim' => '0000002001',
                 'semester' => '4',
-                'role' => 'dosen'
+                'role' => 'dosen',
             ],
+
+            // === ADMIN FAKULTAS ===
             [
                 'faculty_id' => 1,
-                'name' => 'Super Barang',
-                'email' => 'adminbarang1@gmail.com',
-                'password' => Hash::make('12345678'),
-                'nim' => '1204210092',
                 'study_program_id' => 1,
-                'semester' => '4',
-                'role' => 'admin_barang'
-            ],
-            [
-                'faculty_id' => 1,
-                'name' => 'Super Ruangan',
-                'email' => 'adminruangan1@gmail.com',
+                'name' => 'Admin Fakultas Teknik',
+                'email' => 'adminft@gmail.com',
                 'password' => Hash::make('12345678'),
-                'nim' => '1204210034',
-                'study_program_id' => 1,
+                'nim' => '0000003001',
                 'semester' => '4',
-                'role' => 'admin_ruangan'
-            ],
-            [
-                'faculty_id' => 1,
-                'name' => 'User',
-                'email' => 'user1@gmail.com',
-                'password' => Hash::make('12345678'),
-                'nim' => '1204210020',
-                'study_program_id' => 1,
-                'semester' => '4',
-                'role' => 'user'
+                'role' => 'admin_fakultas',
             ],
             [
                 'faculty_id' => 2,
-                'name' => 'Super Barang',
-                'email' => 'adminbarang2@gmail.com',
+                'study_program_id' => 4,
+                'name' => 'Admin Fakultas FEB',
+                'email' => 'adminfeb@gmail.com',
                 'password' => Hash::make('12345678'),
-                'nim' => '120421987',
-                'study_program_id' => 2,
+                'nim' => '0000003002',
                 'semester' => '4',
-                'role' => 'admin_barang'
+                'role' => 'admin_fakultas',
+            ],
+            [
+                'faculty_id' => 3,
+                'study_program_id' => 6,
+                'name' => 'Admin Fakultas Hukum',
+                'email' => 'adminfh@gmail.com',
+                'password' => Hash::make('12345678'),
+                'nim' => '0000003003',
+                'semester' => '4',
+                'role' => 'admin_fakultas',
+            ],
+
+            // === USER (Mahasiswa) ===
+            [
+                'faculty_id' => 1,
+                'study_program_id' => 1,
+                'name' => 'User FT',
+                'email' => 'userft@gmail.com',
+                'password' => Hash::make('12345678'),
+                'nim' => '0000004001',
+                'semester' => '4',
+                'role' => 'user',
             ],
             [
                 'faculty_id' => 2,
-                'name' => 'Super Ruangan',
-                'email' => 'adminruangan2@gmail.com',
+                'study_program_id' => 4,
+                'name' => 'User FEB',
+                'email' => 'userfeb@gmail.com',
                 'password' => Hash::make('12345678'),
-                'nim' => '1204210245',
-                'study_program_id' => 2,
+                'nim' => '0000004002',
                 'semester' => '4',
-                'role' => 'admin_ruangan'
+                'role' => 'user',
             ],
             [
-                'faculty_id' => 2,
-                'name' => 'User',
-                'email' => 'user2@gmail.com',
+                'faculty_id' => 3,
+                'study_program_id' => 6,
+                'name' => 'User FH',
+                'email' => 'userfh@gmail.com',
                 'password' => Hash::make('12345678'),
-                'nim' => '1204210642',
-                'study_program_id' => 2,
+                'nim' => '0000004003',
                 'semester' => '4',
-                'role' => 'user'
+                'role' => 'user',
             ],
         ]);
     }

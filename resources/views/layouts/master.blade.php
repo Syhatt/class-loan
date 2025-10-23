@@ -51,100 +51,85 @@
             <li class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('dashboard') }}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span></a>
+                    <span>Dashboard</span>
+                </a>
             </li>
 
-            @if (auth()->user()->role == 'admin_ruangan')
-                <li class="nav-item {{ request()->is('class.index') ? 'active' : '' }}">
+            {{-- SUPERADMIN --}}
+            @if (auth()->user()->role === 'superadmin')
+                <li class="nav-item {{ request()->is('user*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('user.index') }}">
+                        <i class="fas fa-fw fa-users-cog"></i>
+                        <span>Manajemen User</span>
+                    </a>
+                </li>
+
+                {{-- ADMIN FAKULTAS --}}
+            @elseif (auth()->user()->role === 'admin_fakultas')
+                <li class="nav-item {{ request()->is('class*') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('class.index') }}">
                         <i class="fas fa-fw fa-laptop-house"></i>
-                        <span>Kelas</span></a>
+                        <span>Data Kelas</span>
+                    </a>
                 </li>
 
-                <li class="nav-item {{ request()->is('bookclass.index') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('bookclass.index') }}">
-                        <i class="fas fa-fw fa-table"></i>
-                        <span>Data Peminjaman Kelas</span></a>
-                </li>
-
-                <li class="nav-item {{ request()->is('booking.index') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('booking.index') }}">
-                        <i class="fas fa-fw fa-chalkboard"></i>
-                        <span>Pinjam Kelas</span></a>
-                </li>
-
-                <li class="nav-item {{ request()->is('mybook') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('mybook') }}">
-                        <i class="fas fa-fw fa-chalkboard-teacher"></i>
-                        <span>Peminjaman Kelas Saya</span></a>
-                </li>
-
-                <li class="nav-item {{ request()->is('report.class.index') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('report.class.index') }}">
-                        <i class="fas fa-fw fa-file-pdf"></i>
-                        <span>Laporan</span></a>
-                </li>
-
-                {{-- <li class="nav-item {{ request()->is('report.class.index') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('report.class.index') }}">
-                        <i class="fas fa-fw fa-file-pdf"></i>
-                        <span>Laporan</span></a> --}}
-                </li>
-            @elseif(auth()->user()->role == 'admin_barang')
-                <li class="nav-item {{ request()->is('item') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('item*') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('item.index') }}">
                         <i class="fas fa-fw fa-toolbox"></i>
-                        <span>Barang</span></a>
+                        <span>Data Barang</span>
+                    </a>
                 </li>
 
-                <li class="nav-item {{ request()->is('bookitem') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('bookclass*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('bookclass.index') }}">
+                        <i class="fas fa-fw fa-table"></i>
+                        <span>Data Peminjaman Kelas</span>
+                    </a>
+                </li>
+
+                <li class="nav-item {{ request()->is('bookitem*') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('bookitem.index') }}">
                         <i class="fas fa-fw fa-table"></i>
-                        <span>Data Peminjaman Barang</span></a>
+                        <span>Data Peminjaman Barang</span>
+                    </a>
                 </li>
 
-                <li class="nav-item {{ request()->is('bookitem.index') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('bookingitem.index') }}">
-                        <i class="fas fa-fw fa-box-open"></i>
-                        <span>Pinjam Barang</span></a>
-                </li>
-
-                <li class="nav-item {{ request()->is('mybookitem') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('mybookitem') }}">
-                        <i class="fas fa-fw fa-box"></i>
-                        <span>Peminjaman Barang Saya</span></a>
-                </li>
-
-                <li class="nav-item {{ request()->is('report.item.index') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('report.item.index') }}">
+                <li class="nav-item {{ request()->is('report*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('report.class.index') }}">
                         <i class="fas fa-fw fa-file-pdf"></i>
-                        <span>Laporan</span></a>
+                        <span>Laporan</span>
+                    </a>
                 </li>
-            @elseif(auth()->user()->role == 'user' || auth()->user()->role == 'dosen')
+
+                {{-- USER & DOSEN --}}
+            @elseif (in_array(auth()->user()->role, ['user', 'dosen']))
                 <li class="nav-item {{ request()->is('booking') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('booking.index') }}">
                         <i class="fas fa-fw fa-chalkboard"></i>
-                        <span>Pinjam Kelas</span></a>
+                        <span>Pinjam Kelas</span>
+                    </a>
                 </li>
 
                 <li class="nav-item {{ request()->is('mybook') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('mybook') }}">
                         <i class="fas fa-fw fa-chalkboard-teacher"></i>
-                        <span>Peminjaman Kelas Saya</span></a>
+                        <span>Peminjaman Kelas Saya</span>
+                    </a>
                 </li>
 
                 <li class="nav-item {{ request()->is('bookingitem') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('bookingitem.index') }}">
                         <i class="fas fa-fw fa-box-open"></i>
-                        <span>Pinjam Barang</span></a>
+                        <span>Pinjam Barang</span>
+                    </a>
                 </li>
 
                 <li class="nav-item {{ request()->is('mybookitem') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('mybookitem') }}">
                         <i class="fas fa-fw fa-box"></i>
-                        <span>Peminjaman Barang Saya</span></a>
+                        <span>Peminjaman Barang Saya</span>
+                    </a>
                 </li>
-                {{-- @else --}}
             @endif
 
             <!-- Divider -->

@@ -34,6 +34,10 @@ class ProgramStudySeeder extends Seeder
                 'faculty_id' => 2,
                 'name' => 'Administrasi Bisnis'
             ],
+            [
+                'faculty_id' => 3,
+                'name' => 'Hukum'
+            ],
         ]);
     }
 }
