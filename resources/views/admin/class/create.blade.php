@@ -31,9 +31,9 @@
                         @enderror
                     </div>
                     <div class="form-group">
-                        <label>Gambar</label>
-                        <input type="file" name="image" class="form-control">
-                        @error('image')
+                        <label>Foto Kelas (bisa pilih banyak)</label>
+                        <input type="file" name="image[]" class="form-control" multiple>
+                        @error('image.*')
                             <div class="text-danger"><small>{{ $message }}</small></div>
                         @enderror
                     </div>

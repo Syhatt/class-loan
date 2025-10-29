@@ -111,17 +111,33 @@
                 <div class="container text-center">
                     <div class="row">
                         <div class="col">
-                            <form action="{{ route('bookclass.update', $booking->id) }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ route('bookclass.update', $booking->id) }}" method="POST"
+                                enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
+
                                 <input type="hidden" name="status" value="approved">
-                                <button type="submit" class="btn btn-success btn-sm"><i class="far fa-check-circle"></i>
-                                    Approve</button>
 
                                 <div class="form-group mt-2">
-                                    <input type="file" name="nodin" class="form-control">
+                                    <label>No Surat Nodin</label>
+                                    <input type="text" name="no_surat" class="form-control" required>
                                 </div>
+
+                                <div class="form-group mt-2">
+                                    <label>Nama Wakil Dekan</label>
+                                    <input type="text" name="nama_wadek" class="form-control" required>
+                                </div>
+
+                                <div class="form-group mt-2">
+                                    <label>Upload Tanda Tangan (TTD)</label>
+                                    <input type="file" name="ttd_admin" class="form-control" accept="image/*" required>
+                                </div>
+
+                                <button type="submit" class="btn btn-success btn-sm mt-3">
+                                    <i class="far fa-check-circle"></i> Approve & Generate Nodin
+                                </button>
                             </form>
+
                         </div>
                         <div class="col">
                             <form action="{{ route('bookclass.update', $booking->id) }}" method="POST">

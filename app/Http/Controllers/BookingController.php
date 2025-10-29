@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\BookingClass;
 use App\Models\Classmodel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
@@ -38,10 +41,8 @@ class BookingController extends Controller
     {
         $request->validate([
             'classmodel_id' => 'required',
-            'start_date' => 'required',
-            'end_date' => 'required',
-            'start_time' => 'required',
-            'end_time' => 'required',
+            'start_datetime' => 'required|date',
+            'end_datetime' => 'required|date|after:start_datetime',
             'organization' => 'required',
             'activity_name' => 'required',
             'full_name' => 'required',
@@ -51,66 +52,74 @@ class BookingController extends Controller
             'telp' => 'required',
             'no_letter' => 'required',
             'date_letter' => 'required',
-            'signature' => 'required|file|max:2048',
             'apply_letter' => 'required|file|max:2048',
             'activity_proposal' => 'required|file|max:2048',
         ]);
 
-        $filePaths = [];
+        $start = Carbon::parse($request->start_datetime);
+        $end = Carbon::parse($request->end_datetime);
+        $date = $start->toDateString();
 
-        if ($request->hasFile('signature')) {
-            $filePaths['signature'] = $request->file('signature')->store('booking_class', 'public');
+        // 🔒 Cek apakah ruangan sudah dibooking pada waktu yang bertabrakan
+        $isConflict = BookingClass::where('classmodel_id', $request->classmodel_id)
+            ->whereDate('start_date', $date)
+            ->whereIn('status', ['pending', 'approved'])
+            ->where(function ($query) use ($start, $end) {
+                $query->where(function ($q) use ($start, $end) {
+                    // Kasus 1: waktu baru di tengah waktu lama
+                    $q->where('start_time', '<=', $start->format('H:i'))
+                        ->where('end_time', '>', $start->format('H:i'));
+                })
+                    ->orWhere(function ($q) use ($start, $end) {
+                        // Kasus 2: waktu lama di tengah waktu baru
+                        $q->where('start_time', '<', $end->format('H:i'))
+                            ->where('end_time', '>=', $end->format('H:i'));
+                    })
+                    ->orWhere(function ($q) use ($start, $end) {
+                        // Kasus 3: waktu lama di-cover penuh oleh waktu baru
+                        $q->where('start_time', '>=', $start->format('H:i'))
+                            ->where('end_time', '<=', $end->format('H:i'));
+                    });
+            })
+            ->exists();
+
+        if ($isConflict) {
+            return redirect()->back()
+                ->withInput()
+                ->with(['error' => 'Ruangan ini sudah dipinjam pada waktu tersebut. Silakan pilih waktu lain.']);
         }
 
+        // 🔒 Cegah user yang sama pinjam ruangan sama di tanggal sama (walau waktu beda)
+        $alreadyBookedByUser = BookingClass::where('classmodel_id', $request->classmodel_id)
+            ->whereDate('start_date', $date)
+            ->where('user_id', auth()->id())
+            ->whereIn('status', ['pending', 'approved'])
+            ->exists();
+
+        if ($alreadyBookedByUser) {
+            return redirect()->back()
+                ->withInput()
+                ->with(['error' => 'Anda sudah melakukan peminjaman ruangan ini pada tanggal tersebut.']);
+        }
+
+        // Upload file
+        $filePaths = [];
         if ($request->hasFile('apply_letter')) {
             $filePaths['apply_letter'] = $request->file('apply_letter')->store('booking_class', 'public');
         }
-
         if ($request->hasFile('activity_proposal')) {
             $filePaths['activity_proposal'] = $request->file('activity_proposal')->store('booking_class', 'public');
         }
 
-        $user = auth()->user();
-
-        // --- PRIORITAS ROLE ---
-        $rolePriority = [
-            'superadmin' => 1,
-            'admin_ruangan' => 2,
-            'admin_barang' => 2,
-            'dosen' => 3,
-            'user' => 4,
-        ];
-
-        $currentPriority = $rolePriority[$user->role] ?? 5;
-
-        // --- CEK BOOKING YANG OVERLAP ---
-        $overlaps = BookingClass::where('classmodel_id', $request->classmodel_id)
-            ->where(function ($query) use ($request) {
-                $query->whereBetween('start_time', [$request->start_time, $request->end_time])
-                    ->orWhereBetween('end_time', [$request->start_time, $request->end_time]);
-            })
-            ->whereDate('start_date', $request->start_date)
-            ->get();
-
-        // Kalau ada bentrok
-        foreach ($overlaps as $booking) {
-            $bookerPriority = $rolePriority[$booking->user->role] ?? 5;
-
-            if ($bookerPriority <= $currentPriority) {
-                // Ada booking dengan prioritas lebih tinggi atau sama → tolak
-                return redirect()->back()->with(['error' => 'Booking gagal, ruangan sudah dipakai oleh user dengan prioritas lebih tinggi.']);
-            }
-        }
-
-        // dd($request->all());
+        // Simpan data
         BookingClass::create([
             'faculty_id' => $request->faculty_id,
             'user_id' => auth()->user()->id,
             'classmodel_id' => $request->classmodel_id,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
+            'start_date' => $date,
+            'end_date' => $end->toDateString(),
+            'start_time' => $start->format('H:i'),
+            'end_time' => $end->format('H:i'),
             'organization' => $request->organization,
             'activity_name' => $request->activity_name,
             'full_name' => $request->full_name,
@@ -120,12 +129,12 @@ class BookingController extends Controller
             'telp' => $request->telp,
             'no_letter' => $request->no_letter,
             'date_letter' => $request->date_letter,
-            'signature' => $filePaths['signature'] ?? null,
             'apply_letter' => $filePaths['apply_letter'] ?? null,
             'activity_proposal' => $filePaths['activity_proposal'] ?? null,
+            'status' => 'pending',
         ]);
 
-        return redirect()->route('mybook')->with(['success' => 'Data Berhasil Disimpan!']);
+        return redirect()->route('mybook')->with(['success' => 'Peminjaman berhasil disimpan!']);
     }
 
     /**

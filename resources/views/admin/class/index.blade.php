@@ -23,6 +23,7 @@
                             <th>Desc</th>
                             <th>Image</th>
                             <th>Is Available</th>
+                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -39,6 +40,22 @@
                                     @else
                                         <span class="badge badge-danger">Kosong</span>
                                     @endif
+                                </td>
+                                <td>
+                                    <form action="{{ route('class.toggle', $class->id) }}" method="POST"
+                                        style="display:inline;">
+                                        @csrf
+                                        @method('PATCH')
+                                        @if ($class->is_available)
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-ban"></i> Nonaktifkan
+                                            </button>
+                                        @else
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                <i class="fas fa-check"></i> Aktifkan
+                                            </button>
+                                        @endif
+                                    </form>
                                 </td>
                                 <td>
                                     <form action="{{ route('class.destroy', $class->id) }}" method="post">

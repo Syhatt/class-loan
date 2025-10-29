@@ -31,16 +31,27 @@
                         @enderror
                     </div>
                     <div class="form-group">
-                        <label>Gambar</label>
-                        <input type="text" name="image" value="{{ $classes->image }}" class="form-control">
-                        @error('image')
-                            <div class="text-danger"><small>{{ $message }}</small></div>
-                        @enderror
+                        <label>Foto Kelas Saat Ini</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (explode(',', $classes->image) as $index => $img)
+                                <div class="position-relative m-2" style="display:inline-block;">
+                                    <img src="{{ asset('storage/' . $img) }}" width="120" class="rounded border">
+                                    <form action="{{ route('class.deleteImage', [$classes->id, $index]) }}" method="POST"
+                                        style="position:absolute; top:0; right:0;">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Hapus foto ini?')">&times;</button>
+                                    </form>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
-                    {{-- <div class="form-group">
-                        <label>Gambar</label>
-                        <input type="file" name="image" class="form-control">
-                    </div> --}}
+
+                    <div class="form-group">
+                        <label>Tambah Foto Baru (bisa lebih dari 1)</label>
+                        <input type="file" name="image[]" class="form-control" multiple>
+                    </div>
                     <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Simpan</button>
                 </form>
             </div>

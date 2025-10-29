@@ -30,6 +30,7 @@ Route::get('/', fn() => redirect()->route('login'));
 Route::middleware(['auth', 'role:admin_fakultas'])->group(function () {
     // Manajemen kelas & barang
     Route::resource('class', ClassController::class);
+    Route::patch('/class/{id}/toggle', [ClassController::class, 'toggleStatus'])->name('class.toggle');
     Route::resource('item', ItemController::class);
 
     // Approval dan pengelolaan peminjaman

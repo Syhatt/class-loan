@@ -29,7 +29,7 @@ return new class extends Migration
             $table->string('telp');
             $table->string('no_letter');
             $table->date('date_letter');
-            $table->string('signature');
+            // $table->string('signature');
             $table->string('apply_letter');
             $table->string('activity_proposal');
             $table->enum('status', ['pending', 'approved', 'rejected', 'returned'])->default('pending');

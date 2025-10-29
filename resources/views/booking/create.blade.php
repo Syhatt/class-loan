@@ -13,9 +13,21 @@
                     <a href="{{ route('booking.index') }}" class="btn btn-danger btn-sm"><i class="fas fa-arrow-left"></i>
                         Kembali</a>
                 </div>
+
+                {{-- @if (session('error'))
+                    <div class="alert alert-danger">{{ session('error') }}</div>
+                @endif
+                @if (session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif --}}
+
                 <div class="card-body">
                     <form action="{{ route('booking.store') }}" method="post" enctype="multipart/form-data">
                         @csrf
+                        @if (session('error'))
+                            <div class="alert alert-danger">{{ session('error') }}</div>
+                        @endif
+
                         <div class="form-group">
                             <label>Kelas</label>
                             <input type="hidden" name="faculty_id" value="{{ $class->faculty_id }}">
@@ -26,32 +38,12 @@
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label>Tanggal Mulai Kegiatan</label>
-                            <input type="date" name="start_date" class="form-control" value="{{ old('start_date') }}">
-                            @error('start_date')
-                                <div class="text-danger"><small>{{ $message }}</small></div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label>Tanggal Selesai Kegiatan</label>
-                            <input type="date" name="end_date" class="form-control" value="{{ old('end_date') }}">
-                            @error('end_date')
-                                <div class="text-danger"><small>{{ $message }}</small></div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label>Jam Mulai Kegiatan</label>
-                            <input type="time" name="start_time" class="form-control" value="{{ old('start_time') }}">
-                            @error('start_time')
-                                <div class="text-danger"><small>{{ $message }}</small></div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label>Jam Selesai Kegiatan</label>
-                            <input type="time" name="end_time" class="form-control" value="{{ old('end_time') }}">
-                            @error('end_time')
-                                <div class="text-danger"><small>{{ $message }}</small></div>
-                            @enderror
+                            <label>Waktu Peminjaman (Mulai - Selesai)</label>
+                            <div class="input-group">
+                                <input type="datetime-local" name="start_datetime" class="form-control" required>
+                                <span class="input-group-text">s.d.</span>
+                                <input type="datetime-local" name="end_datetime" class="form-control" required>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Nama Organisasi</label>
@@ -71,28 +63,32 @@
                         </div>
                         <div class="form-group">
                             <label>Nama Lengkap Mahasiswa</label>
-                            <input type="text" name="full_name" class="form-control" value="{{ auth()->user()->name }}" readonly>
+                            <input type="text" name="full_name" class="form-control" value="{{ auth()->user()->name }}"
+                                readonly>
                             @error('full_name')
                                 <div class="text-danger"><small>{{ $message }}</small></div>
                             @enderror
                         </div>
                         <div class="form-group">
                             <label>NIM</label>
-                            <input type="text" name="nim" class="form-control" value="{{ auth()->user()->nim }}" readonly>
+                            <input type="text" name="nim" class="form-control" value="{{ auth()->user()->nim }}"
+                                readonly>
                             @error('nim')
                                 <div class="text-danger"><small>{{ $message }}</small></div>
                             @enderror
                         </div>
                         <div class="form-group">
                             <label>Semester</label>
-                            <input type="text" name="semester" class="form-control" value="{{ auth()->user()->semester }}" readonly>
+                            <input type="text" name="semester" class="form-control"
+                                value="{{ auth()->user()->semester }}" readonly>
                             @error('semester')
                                 <div class="text-danger"><small>{{ $message }}</small></div>
                             @enderror
                         </div>
                         <div class="form-group">
                             <label>Prodi</label>
-                            <input type="text" name="prodi" class="form-control" value="{{ auth()->user()->studyProgram->name }}" readonly>
+                            <input type="text" name="prodi" class="form-control"
+                                value="{{ auth()->user()->studyProgram->name }}" readonly>
                             @error('prodi')
                                 <div class="text-danger"><small>{{ $message }}</small></div>
                             @enderror
@@ -113,16 +109,8 @@
                         </div>
                         <div class="form-group">
                             <label>Tanggal Surat Permohonan Izin Kegiatan</label>
-                            <input type="date" name="date_letter" class="form-control"
-                                value="{{ old('date_letter') }}">
+                            <input type="date" name="date_letter" class="form-control" value="{{ old('date_letter') }}">
                             @error('date_letter')
-                                <div class="text-danger"><small>{{ $message }}</small></div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label>TTD Yang Mengajukan Kegiatan</label>
-                            <input type="file" name="signature" class="form-control">
-                            @error('signature')
                                 <div class="text-danger"><small>{{ $message }}</small></div>
                             @enderror
                         </div>
