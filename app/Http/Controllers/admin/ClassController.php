@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Classmodel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ClassController extends Controller
 {
@@ -18,6 +19,17 @@ class ClassController extends Controller
         $classes = Classmodel::where('faculty_id', auth()->user()->faculty_id)->get();
 
         return view('admin.class.index', compact('pageTitle', 'classes'));
+    }
+
+    public function toggleStatus($id)
+    {
+        $class = Classmodel::findOrFail($id);
+        $class->is_available = !$class->is_available; // toggle true/false
+        $class->save();
+
+        $status = $class->is_available ? 'diaktifkan' : 'dinonaktifkan';
+
+        return redirect()->route('class.index')->with('success', "Kelas {$class->name} berhasil {$status}!");
     }
 
     /**
@@ -40,18 +52,23 @@ class ClassController extends Controller
             'faculty_id' => 'required',
             'name' => 'required',
             'desc' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Simpan gambar ke storage
-        $filename = time() . '.' . $request->image->extension();
-        $path = $request->file('image')->storeAs('images', $filename, 'public');
+        $imagePaths = [];
+        if ($request->hasFile('image')) {
+            foreach ($request->file('image') as $file) {
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $path = $file->storeAs('images', $filename, 'public');
+                $imagePaths[] = $path;
+            }
+        }
 
         Classmodel::create([
             'faculty_id' => $request->faculty_id,
             'name' => $request->name,
             'desc' => $request->desc,
-            'image' => $path,
+            'image' => implode(',', $imagePaths), // disimpan jadi string
         ]);
 
         return redirect()->route('class.index')->with(['success' => 'Data Berhasil Disimpan!']);
@@ -84,17 +101,53 @@ class ClassController extends Controller
         $request->validate([
             'name' => 'required',
             'desc' => 'required',
-            'image' => 'required',
+            'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $classes = Classmodel::findOrFail($id);
-        $classes->update([
+        $class = Classmodel::findOrFail($id);
+
+        // ambil semua gambar lama
+        $imagePaths = explode(',', $class->image);
+
+        // kalau ada file baru, tambahkan
+        if ($request->hasFile('image')) {
+            foreach ($request->file('image') as $file) {
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $path = $file->storeAs('images', $filename, 'public');
+                $imagePaths[] = $path;
+            }
+        }
+
+        $class->update([
             'name' => $request->name,
             'desc' => $request->desc,
-            'image' => $request->image,
+            'image' => implode(',', $imagePaths),
         ]);
 
-        return redirect()->route('class.index')->with(['success' => 'Data Berhasil Diubah!']);
+        return redirect()->route('class.edit', $id)->with('success', 'Data berhasil diperbarui!');
+    }
+
+    /**
+     * Hapus salah satu gambar dari kelas
+     */
+    public function deleteImage($id, $index)
+    {
+        $class = Classmodel::findOrFail($id);
+        $images = explode(',', $class->image);
+
+        if (isset($images[$index])) {
+            // Hapus dari storage
+            Storage::disk('public')->delete($images[$index]);
+
+            // Hapus dari array
+            unset($images[$index]);
+
+            // Simpan ulang string baru
+            $class->image = implode(',', array_values($images));
+            $class->save();
+        }
+
+        return back()->with('success', 'Foto berhasil dihapus!');
     }
 
     /**
