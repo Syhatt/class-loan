@@ -31,6 +31,7 @@ Route::middleware(['auth', 'role:admin_fakultas'])->group(function () {
     // Manajemen kelas & barang
     Route::resource('class', ClassController::class);
     Route::patch('/class/{id}/toggle', [ClassController::class, 'toggleStatus'])->name('class.toggle');
+    Route::patch('/class/{id}/delete-image/{index}', [ClassController::class, 'deleteImage'])->name('class.deleteImage');
     Route::resource('item', ItemController::class);
 
     // Approval dan pengelolaan peminjaman
