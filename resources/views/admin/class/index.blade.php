@@ -33,7 +33,25 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $class->name }}</td>
                                 <td>{{ $class->desc }}</td>
-                                <td><img src="{{ asset('storage/' . $class->image) }}" width="100"></td>
+                                <td>
+                                    @php
+                                        $images = explode(',', $class->image);
+                                    @endphp
+                                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                                        @foreach ($images as $index => $img)
+                                            @if ($index < 3)
+                                                <img src="{{ asset('storage/' . $img) }}" width="70" height="70"
+                                                    class="img-thumbnail previewable"
+                                                    data-images="{{ implode(',', $images) }}"
+                                                    data-index="{{ $index }}"
+                                                    style="object-fit: cover; cursor: pointer;">
+                                            @endif
+                                        @endforeach
+                                        @if (count($images) > 3)
+                                            <small class="text-muted">+{{ count($images) - 3 }} lagi</small>
+                                        @endif
+                                    </div>
+                                </td>
                                 <td>
                                     @if ($class->is_available == true)
                                         <span class="badge badge-success">Tersedia</span>
@@ -75,4 +93,44 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Preview Foto -->
+    <div class="modal fade" id="imagePreviewModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-dark text-center">
+                <div class="modal-body p-0">
+                    <img id="previewImage" src="" class="img-fluid" style="max-height: 80vh;">
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-light btn-sm" id="prevBtn">Sebelumnya</button>
+                    <button type="button" class="btn btn-light btn-sm" id="nextBtn">Berikutnya</button>
+                    <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let images = [];
+        let currentIndex = 0;
+
+        document.querySelectorAll('.previewable').forEach(img => {
+            img.addEventListener('click', e => {
+                images = e.target.dataset.images.split(',');
+                currentIndex = parseInt(e.target.dataset.index);
+                document.getElementById('previewImage').src = '/storage/' + images[currentIndex];
+                $('#imagePreviewModal').modal('show');
+            });
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
+            document.getElementById('previewImage').src = '/storage/' + images[currentIndex];
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % images.length;
+            document.getElementById('previewImage').src = '/storage/' + images[currentIndex];
+        });
+    </script>
 @endsection
