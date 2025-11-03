@@ -10,6 +10,7 @@ use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BookingItemController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\MyBookController;
 use App\Http\Controllers\MyBookItemController;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', fn() => redirect()->route('login'));
+Route::get('/landing', [LandingController::class, 'index'])->name('landing');
 
 Route::middleware(['auth', 'role:admin_fakultas'])->group(function () {
     // Manajemen kelas & barang
