@@ -47,7 +47,10 @@ class BookingItemController extends Controller
         $request->validate([
             'item_id' => 'required|exists:items,id',
             'qty' => 'required|integer|min:1',
-            'booking_class_id' => 'required|exists:booking_classes,id'
+            'booking_class_id' => 'required|exists:booking_classes,id',
+            'hari_pengembalian' => 'nullable|string|max:100',
+            'tanggal_pengembalian' => 'nullable|date',
+            'jam_pengembalian' => 'nullable|date_format:H:i',
         ]);
 
         $user = auth()->user();
@@ -59,13 +62,12 @@ class BookingItemController extends Controller
             ->first();
 
         if (!$approvedRoomLoan) {
-            // return back()->with('error', 'Anda harus memiliki peminjaman ruangan yang disetujui untuk meminjam barang.');
-            return alert('gaisok cak');
+            return redirect()->back()->withInput()->with(['error' => 'Anda harus memiliki peminjaman ruangan yang sudah disetujui sebelum meminjam barang.']);
         }
 
         $item = Item::findOrFail($request->item_id);
         if ($item->stock < $request->qty) {
-            return redirect()->back()->with('error', 'Stok barang tidak mencukupi.');
+            return redirect()->back()->withInput()->with(['error' => 'Stok barang tidak mencukupi.']);
         }
 
         // Kurangi stok barang
@@ -78,41 +80,12 @@ class BookingItemController extends Controller
             'booking_classes_id' => $approvedRoomLoan->id,
             'item_id' => $request->item_id,
             'qty' => $request->qty,
+            'hari_pengembalian' => $request->hari_pengembalian,
+            'tanggal_pengembalian' => $request->tanggal_pengembalian,
+            'jam_pengembalian' => $request->jam_pengembalian,
             'status' => 'pending',
         ]);
 
         return redirect()->route('bookingitem.index')->with(['success' => 'Data Berhasil Disimpan!']);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

@@ -19,6 +19,9 @@ return new class extends Migration
             $table->foreignId('item_id')->constrained();
             $table->integer('qty');
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->string('hari_pengembalian')->nullable();
+            $table->date('tanggal_pengembalian')->nullable();
+            $table->time('jam_pengembalian')->nullable();
             $table->timestamps();
         });
     }

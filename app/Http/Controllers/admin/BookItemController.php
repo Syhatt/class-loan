@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\admin;
 
+use App\Helpers\NodinBarangGenerator;
 use App\Http\Controllers\Controller;
 use App\Models\BookingItem;
 use Illuminate\Http\Request;
@@ -17,22 +18,6 @@ class BookItemController extends Controller
         $booking = BookingItem::where('faculty_id', auth()->user()->faculty_id)->get();
 
         return view('admin.bookitem.index', compact('pageTitle', 'booking'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
     }
 
     /**
@@ -65,27 +50,70 @@ class BookItemController extends Controller
 
         $request->validate([
             'status' => 'required|in:approved,rejected',
-            'nodin_barang' => 'nullable|file|mimes:pdf,doc,docx|max:2048'
+            'nama_kabag' => 'nullable|string|max:255',
+            'nip_kabag' => 'nullable|string|max:100',
+            'ttd_kabag' => 'nullable|file|mimes:png,jpg,jpeg|max:2048',
         ]);
 
-        $data = ['status' => $request->status];
+        if ($request->status === 'approved') {
+            // Validasi jika approve harus ada data kabag
+            $request->validate([
+                'nama_kabag' => 'required|string|max:255',
+                'nip_kabag' => 'required|string|max:100',
+                'ttd_kabag' => 'required|file|mimes:png,jpg,jpeg|max:2048',
+            ]);
 
-        if ($request->hasFile('nodin_barang')) {
-            $filename = time() . '_' . $request->file('nodin_barang')->getClientOriginalName();
-            $request->file('nodin_barang')->move(public_path('uploads/nodin_barang'), $filename);
-            $data['nodin_barang'] = $filename;
+            // Upload ttd kabag
+            $signaturePath = null;
+            if ($request->hasFile('ttd_kabag')) {
+                $signaturePath = $request->file('ttd_kabag')->store('signatures', 'public');
+            }
+
+            // Generate surat pernyataan kesanggupan otomatis
+            try {
+                $pdfRelativePath = NodinBarangGenerator::generate(
+                    $booking,
+                    $request->nama_kabag,
+                    $request->nip_kabag,
+                    $signaturePath
+                );
+
+                // Update status dan simpan path nodin ke database
+                $booking->update([
+                    'status' => 'approved',
+                    'nodin_barang' => $pdfRelativePath
+                ]);
+            } catch (\Exception $e) {
+                return redirect()->back()->with(['error' => 'Gagal generate surat: ' . $e->getMessage()]);
+            }
+        } else {
+            // Jika reject, hanya update status
+            $booking->update(['status' => 'rejected']);
         }
+        // dd($request->all());
 
-        $booking->update($data);
-
-        return redirect()->route('bookitem.index')->with(['success' => 'Data Berhasil Diubah!']);
+        return redirect()->route('bookitem.index')->with(['success' => 'Data berhasil diperbarui!']);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage (optional, jika diperlukan).
      */
     public function destroy(string $id)
     {
-        //
+        $booking = BookingItem::findOrFail($id);
+
+        // Kembalikan stok barang jika peminjaman dihapus
+        $item = $booking->item;
+        $item->stock += $booking->qty;
+        $item->save();
+
+        // Hapus file nodin jika ada
+        if ($booking->nodin_barang && file_exists(public_path($booking->nodin_barang))) {
+            unlink(public_path($booking->nodin_barang));
+        }
+
+        $booking->delete();
+
+        return redirect()->route('bookitem.index')->with(['success' => 'Data berhasil dihapus!']);
     }
 }

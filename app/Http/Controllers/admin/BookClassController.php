@@ -23,22 +23,6 @@ class BookClassController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
      * Display the specified resource.
      */
     public function show(string $id)
@@ -47,14 +31,6 @@ class BookClassController extends Controller
         $booking = BookingClass::findOrFail($id);
 
         return view('admin.bookclass.show', compact('pageTitle', 'booking'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
     }
 
     /**
@@ -94,13 +70,5 @@ class BookClassController extends Controller
         }
 
         return redirect()->route('bookclass.index')->with(['success' => 'Data berhasil diperbarui!']);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }
