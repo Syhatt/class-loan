@@ -45,6 +45,26 @@
                         <input type="number" name="qty" class="form-control">
                     </div>
 
+                    <hr>
+
+                    <h5>Jadwal Pengembalian Barang</h5>
+
+                    <div class="form-group">
+                        <label>Hari Pengembalian</label>
+                        <input type="text" name="hari_pengembalian" class="form-control" placeholder="Contoh: Senin"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tanggal Pengembalian</label>
+                        <input type="date" name="tanggal_pengembalian" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Jam Pengembalian</label>
+                        <input type="time" name="jam_pengembalian" class="form-control" required>
+                    </div>
+
                     <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Simpan</button>
                 </form>
             </div>

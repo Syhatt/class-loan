@@ -26,8 +26,8 @@
                     </thead>
                     <tbody>
                         @foreach ($bookitem as $bookitem)
-                        {{-- mengambil value dari class --}}
-                        {{-- dd($bookitem->bookingClass->classmodel->name) --}}
+                            {{-- mengambil value dari class --}}
+                            {{-- dd($bookitem->bookingClass->classmodel->name) --}}
                             <tr class="text-center">
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $bookitem->faculty->name }}</td>
@@ -46,8 +46,9 @@
                                 </td>
                                 <td>
                                     @if ($bookitem->nodin_barang)
-                                        <a href="{{ asset('uploads/nodin_barang/' . $bookitem->nodin_barang) }}" class="btn btn-primary btn-sm" download>
-                                            Download Nota Dinas
+                                        <a href="{{ asset($bookitem->nodin_barang) }}" class="btn btn-primary btn-sm"
+                                            target="_blank">
+                                            <i class="fas fa-download"></i> Download
                                         </a>
                                     @else
                                         <span class="text-muted">Belum tersedia</span>
