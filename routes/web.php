@@ -30,12 +30,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn() => redirect()->route('login'));
 Route::get('/landing', [LandingController::class, 'index'])->name('landing');
 
-Route::middleware(['auth', 'role:admin_fakultas'])->group(function () {
+Route::middleware(['auth', 'role:admin_fakultas,superadmin'])->group(function () {
     // Manajemen kelas & barang
     Route::resource('class', ClassController::class);
     Route::patch('/class/{id}/toggle', [ClassController::class, 'toggleStatus'])->name('class.toggle');
     Route::patch('/class/{id}/delete-image/{index}', [ClassController::class, 'deleteImage'])->name('class.deleteImage');
     Route::resource('item', ItemController::class);
+    Route::resource('faculty', FacultyController::class);
+    Route::resource('user', UserController::class);
 
     // Approval dan pengelolaan peminjaman
     Route::resource('bookclass', BookClassController::class);
@@ -61,7 +63,7 @@ Route::middleware(['auth', 'role:admin_fakultas'])->group(function () {
 });
 
 // Dashboard user, dosen, admin_fakultas
-Route::middleware(['auth', 'role:user,dosen,admin_fakultas'])->group(function () {
+Route::middleware(['auth', 'role:user,dosen,admin_fakultas,superadmin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/databooking', [DashboardController::class, 'databooking'])->name('bookings.data');
 
@@ -77,12 +79,12 @@ Route::middleware(['auth', 'role:user,dosen,admin_fakultas'])->group(function ()
 });
 
 // Superadmin
-Route::middleware(['auth', 'role:superadmin,admin_fakultas'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('user', UserController::class);
-    Route::resource('class', ClassController::class);
-    Route::patch('/class/{id}/toggle', [ClassController::class, 'toggleStatus'])->name('class.toggle');
-    Route::patch('/class/{id}/delete-image/{index}', [ClassController::class, 'deleteImage'])->name('class.deleteImage');
-    Route::resource('item', ItemController::class);
-    Route::resource('faculty', FacultyController::class);
-});
+// Route::middleware(['auth', 'role:superadmin,admin_fakultas'])->group(function () {
+//     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+//     Route::resource('user', UserController::class);
+//     Route::resource('class', ClassController::class);
+//     Route::patch('/class/{id}/toggle', [ClassController::class, 'toggleStatus'])->name('class.toggle');
+//     Route::patch('/class/{id}/delete-image/{index}', [ClassController::class, 'deleteImage'])->name('class.deleteImage');
+//     Route::resource('item', ItemController::class);
+//     Route::resource('faculty', FacultyController::class);
+// });

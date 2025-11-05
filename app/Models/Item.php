@@ -15,4 +15,9 @@ class Item extends Model
     {
         return $this->hasMany(BookingItem::class);
     }
+
+    public function faculty()
+    {
+        return $this->belongsTo(Faculty::class);
+    }
 }

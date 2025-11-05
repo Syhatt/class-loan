@@ -63,6 +63,24 @@
                         <span>Manajemen User</span>
                     </a>
                 </li>
+                <li class="nav-item {{ request()->is('class*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('class.index') }}">
+                        <i class="fas fa-fw fa-laptop-house"></i>
+                        <span>Data Kelas</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ request()->is('item*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('item.index') }}">
+                        <i class="fas fa-fw fa-toolbox"></i>
+                        <span>Data Barang</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ request()->is('faculty*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('faculty.index') }}">
+                        <i class="fas fa-fw fa-hotel"></i>
+                        <span>Data Fakultas</span>
+                    </a>
+                </li>
 
                 {{-- ADMIN FAKULTAS --}}
             @elseif (auth()->user()->role === 'admin_fakultas')
