@@ -16,6 +16,7 @@
                         <tr class="text-center">
                             <th>No</th>
                             <th>Name</th>
+                            <th>Fakultas</th>
                             <th>Desc</th>
                             <th>Stock</th>
                             <th>Action</th>
@@ -26,6 +27,7 @@
                             <tr class="text-center">
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $item->name }}</td>
+                                <td>{{ $item->faculty->name }}</td>
                                 <td>{{ $item->desc }}</td>
                                 <td>{{ $item->stock }}</td>
                                 <td>

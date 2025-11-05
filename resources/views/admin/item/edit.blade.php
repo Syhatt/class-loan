@@ -16,6 +16,19 @@
                 <form action="{{ route('item.update', $item->id) }}" method="post">
                     @csrf
                     @method('put')
+                    @if (auth()->user()->role === 'superadmin')
+                        <div class="form-group">
+                            <label>Pilih Fakultas</label>
+                            <select name="faculty_id" class="form-control" required>
+                                @foreach ($faculties as $faculty)
+                                    <option value="{{ $faculty->id }}"
+                                        {{ $faculty->id == $item->faculty_id ? 'selected' : '' }}>
+                                        {{ $faculty->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
                     <div class="form-group">
                         <label>Nama</label>
                         <input type="text" name="name" value="{{ $item->name }}" class="form-control">

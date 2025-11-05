@@ -13,8 +13,20 @@
                     Kembali</a>
             </div>
             <div class="card-body">
-                <form action="{{route('item.store')}}" method="post">
+                <form action="{{ route('item.store') }}" method="post">
                     @csrf
+                    @if (auth()->user()->role === 'superadmin')
+                        <div class="form-group">
+                            <label>Pilih Fakultas</label>
+                            <select name="faculty_id" class="form-control" required>
+                                <option value="">-- Pilih Fakultas --</option>
+                                @foreach ($faculties as $faculty)
+                                    <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+
                     <div class="form-group">
                         <label>Nama</label>
                         <input type="text" name="name" class="form-control">

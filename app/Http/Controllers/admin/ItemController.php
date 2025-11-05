@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Faculty;
 use App\Models\Item;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,12 @@ class ItemController extends Controller
     public function index()
     {
         $pageTitle = 'Barang';
-        $item = Item::where('faculty_id', auth()->user()->faculty_id)->get();
+
+        if (auth()->user()->role === 'superadmin') {
+            $item = Item::with('faculty')->get(); // tampil semua + fakultas
+        } else {
+            $item = Item::where('faculty_id', auth()->user()->faculty_id)->get();
+        }
 
         return view('admin.item.index', compact('pageTitle', 'item'));
     }
@@ -25,6 +31,11 @@ class ItemController extends Controller
     public function create()
     {
         $pageTitle = 'Tambah Barang';
+
+        if (auth()->user()->role === 'superadmin') {
+            $faculties = Faculty::all();
+            return view('admin.item.create', compact('pageTitle', 'faculties'));
+        }
 
         return view('admin.item.create', compact('pageTitle'));
     }
@@ -40,7 +51,12 @@ class ItemController extends Controller
             'stock' => 'required',
         ]);
 
+        $facultyId = auth()->user()->role === 'superadmin'
+            ? $request->faculty_id
+            : auth()->user()->faculty_id;
+
         Item::create([
+            'faculty_id' => $facultyId,
             'name' => $request->name,
             'desc' => $request->desc,
             'stock' => $request->stock,
@@ -65,6 +81,11 @@ class ItemController extends Controller
         $pageTitle = 'Edit Barang';
         $item = Item::find($id);
 
+        if (auth()->user()->role === 'superadmin') {
+            $faculties = Faculty::all();
+            return view('admin.item.edit', compact('pageTitle', 'item', 'faculties'));
+        }
+
         return view('admin.item.edit', compact('pageTitle', 'item'));
     }
 
@@ -80,7 +101,13 @@ class ItemController extends Controller
         ]);
 
         $item = Item::findOrFail($id);
+
+        $facultyId = auth()->user()->role === 'superadmin'
+            ? $request->faculty_id
+            : auth()->user()->faculty_id;
+
         $item->update([
+            'faculty_id' => $facultyId,
             'name' => $request->name,
             'desc' => $request->desc,
             'stock' => $request->stock,
