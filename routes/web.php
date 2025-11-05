@@ -3,6 +3,7 @@
 use App\Http\Controllers\admin\BookClassController;
 use App\Http\Controllers\admin\BookItemController;
 use App\Http\Controllers\admin\ClassController;
+use App\Http\Controllers\admin\FacultyController;
 use App\Http\Controllers\admin\ItemController;
 use App\Http\Controllers\admin\ReportClassController;
 use App\Http\Controllers\admin\ReportItemController;
@@ -76,6 +77,12 @@ Route::middleware(['auth', 'role:user,dosen,admin_fakultas'])->group(function ()
 });
 
 // Superadmin
-Route::middleware(['auth', 'role:superadmin'])->group(function () {
+Route::middleware(['auth', 'role:superadmin,admin_fakultas'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('user', UserController::class);
+    Route::resource('class', ClassController::class);
+    Route::patch('/class/{id}/toggle', [ClassController::class, 'toggleStatus'])->name('class.toggle');
+    Route::patch('/class/{id}/delete-image/{index}', [ClassController::class, 'deleteImage'])->name('class.deleteImage');
+    Route::resource('item', ItemController::class);
+    Route::resource('faculty', FacultyController::class);
 });

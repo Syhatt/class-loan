@@ -1,0 +1,47 @@
+@extends('layouts.master')
+@section('content')
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{{ $pageTitle }}</h1>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <a href="{{ route('class.index') }}" class="btn btn-danger btn-sm"><i class="fas fa-arrow-left"></i>
+                    Kembali</a>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('class.store') }}" method="post" enctype="multipart/form-data">
+                    @csrf
+
+                    <div class="form-group">
+                        <label>Pilih Fakultas</label>
+                        <select name="faculty_id" class="form-control" required>
+                            <option value="">-- Pilih Fakultas --</option>
+                            @foreach ($faculties as $faculty)
+                                <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nama</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Deskripsi</label>
+                        <textarea name="desc" cols="30" rows="5" class="form-control" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Foto Kelas (bisa pilih banyak)</label>
+                        <input type="file" name="image[]" class="form-control" multiple>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Simpan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+@endsection
