@@ -21,6 +21,7 @@
                             <th>No</th>
                             <th>Name</th>
                             <th>Desc</th>
+                            <th>Fakultas</th>
                             <th>Image</th>
                             <th>Is Available</th>
                             <th>Status</th>
@@ -33,6 +34,7 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $class->name }}</td>
                                 <td>{{ $class->desc }}</td>
+                                <td>{{ $class->faculty->name }}</td>
                                 <td>
                                     @php
                                         $images = explode(',', $class->image);

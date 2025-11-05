@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Classmodel;
+use App\Models\Faculty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +17,12 @@ class ClassController extends Controller
     public function index()
     {
         $pageTitle = 'Kelas';
-        $classes = Classmodel::where('faculty_id', auth()->user()->faculty_id)->get();
+
+        if (auth()->user()->role == 'superadmin') {
+            $classes = Classmodel::with('faculty')->get();
+        } else {
+            $classes = Classmodel::where('faculty_id', auth()->user()->faculty_id)->get();
+        }
 
         return view('admin.class.index', compact('pageTitle', 'classes'));
     }
@@ -38,8 +44,13 @@ class ClassController extends Controller
     public function create()
     {
         $pageTitle = 'Tambah Kelas';
-        $facultyId = Auth::user()->faculty_id;
 
+        if (auth()->user()->role == 'superadmin') {
+            $faculties = Faculty::all();
+            return view('admin.class.create_superadmin', compact('pageTitle', 'faculties'));
+        }
+
+        $facultyId = Auth::user()->faculty_id;
         return view('admin.class.create', compact('pageTitle', 'facultyId'));
     }
 
@@ -68,7 +79,7 @@ class ClassController extends Controller
             'faculty_id' => $request->faculty_id,
             'name' => $request->name,
             'desc' => $request->desc,
-            'image' => implode(',', $imagePaths), // disimpan jadi string
+            'image' => implode(',', $imagePaths),
         ]);
 
         return redirect()->route('class.index')->with(['success' => 'Data Berhasil Disimpan!']);
