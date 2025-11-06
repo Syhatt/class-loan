@@ -96,7 +96,6 @@
                 </tr>
             </table>
 
-            {{-- BAGIAN APPROVAL --}}
             @if ($booking->status === 'pending')
                 <div class="card mt-4">
                     <div class="card-header bg-primary text-white">
