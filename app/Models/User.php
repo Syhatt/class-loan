@@ -12,6 +12,21 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($user) {
+            $user->password = bcrypt($user->nim);
+        });
+
+        static::updating(function ($user) {
+            if ($user->isDirty('nim')) {
+                $user->password = bcrypt($user->nim);
+            }
+        });
+    }
+
     use HasApiTokens;
     use HasFactory;
     use HasProfilePhoto;

@@ -22,6 +22,8 @@
                                 @enderror
                             </div>
                             <div class="form-group">
+                                {{-- <input id="nim" class="block mt-1 w-full" type="text" name="nim" required autofocus placeholder="Masukkan NIM"> --}}
+                                {{-- <input type="text" name="nim" class="form-control form-control-user" placeholder="NIM/NIP"> --}}
                                 <input type="password" name="password" class="form-control form-control-user"
                                     id="exampleInputPassword" placeholder="Password" >
                                 @error('password')
