@@ -112,10 +112,16 @@
                     </a>
                 </li>
 
-                <li class="nav-item {{ request()->is('report*') ? 'active' : '' }}">
+                {{-- <li class="nav-item {{ request()->is('report*') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('report.class.index') }}">
                         <i class="fas fa-fw fa-file-pdf"></i>
                         <span>Laporan</span>
+                    </a>
+                </li> --}}
+                <li class="nav-item {{ request()->is('report*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('report.index') }}">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Laporan New</span>
                     </a>
                 </li>
 

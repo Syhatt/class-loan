@@ -14,18 +14,17 @@
                         <form action="{{ route('login') }}" method="POST" class="user">
                             @csrf
                             <div class="form-group">
-                                <input type="email" name="email" class="form-control form-control-user"
+                                {{-- <input type="email" name="email" class="form-control form-control-user"
                                     id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Enter Email Address..."
-                                    >
-                                @error('email')
+                                    > --}}
+                                <input type="text" name="nim" class="form-control form-control-user" placeholder="NIM/NIP">
+                                @error('nim')
                                     <div class="text-danger"><small>{{ $message }}</small></div>
                                 @enderror
                             </div>
                             <div class="form-group">
-                                {{-- <input id="nim" class="block mt-1 w-full" type="text" name="nim" required autofocus placeholder="Masukkan NIM"> --}}
-                                {{-- <input type="text" name="nim" class="form-control form-control-user" placeholder="NIM/NIP"> --}}
                                 <input type="password" name="password" class="form-control form-control-user"
-                                    id="exampleInputPassword" placeholder="Password" >
+                                    id="exampleInputPassword" placeholder="Password">
                                 @error('password')
                                     <div class="text-danger"><small>{{ $message }}</small></div>
                                 @enderror
