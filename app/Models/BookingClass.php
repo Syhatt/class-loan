@@ -18,7 +18,7 @@ class BookingClass extends Model
 
     public function bookingItems()
     {
-        return $this->hasMany(BookingItem::class);
+        return $this->hasMany(BookingItem::class, 'booking_classes_id');
     }
 
     public function classmodel()

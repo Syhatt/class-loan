@@ -6,8 +6,10 @@ use App\Http\Controllers\admin\ClassController;
 use App\Http\Controllers\admin\FacultyController;
 use App\Http\Controllers\admin\ItemController;
 use App\Http\Controllers\admin\ReportClassController;
+use App\Http\Controllers\admin\ReportController;
 use App\Http\Controllers\admin\ReportItemController;
 use App\Http\Controllers\admin\UserController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BookingItemController;
 use App\Http\Controllers\DashboardController;
@@ -28,6 +30,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', fn() => redirect()->route('login'));
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/landing', [LandingController::class, 'index'])->name('landing');
 
 Route::middleware(['auth', 'role:admin_fakultas,superadmin'])->group(function () {
@@ -60,6 +65,9 @@ Route::middleware(['auth', 'role:admin_fakultas,superadmin'])->group(function ()
     Route::get('/reports/item', [ReportItemController::class, 'index'])->name('report.item.index');
     Route::get('/reports/item/generate', [ReportItemController::class, 'generate'])->name('report.item.generate');
     Route::get('/reports/item/download', [ReportItemController::class, 'download'])->name('report.item.download');
+
+    Route::get('/report', [ReportController::class, 'index'])->name('report.index');
+    Route::get('/report/pdf', [ReportController::class, 'exportPdf'])->name('report.export.pdf');
 });
 
 // Dashboard user, dosen, admin_fakultas
