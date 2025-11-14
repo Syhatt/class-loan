@@ -81,6 +81,40 @@
                         <span>Data Fakultas</span>
                     </a>
                 </li>
+                <li class="nav-item {{ request()->is('booking') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('booking.index') }}">
+                        <i class="fas fa-fw fa-chalkboard"></i>
+                        <span>Pinjam Kelas</span>
+                    </a>
+                </li>
+
+                <li class="nav-item {{ request()->is('mybook') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('mybook') }}">
+                        <i class="fas fa-fw fa-chalkboard-teacher"></i>
+                        <span>Peminjaman Kelas Saya</span>
+                    </a>
+                </li>
+
+                <li class="nav-item {{ request()->is('bookingitem') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('bookingitem.index') }}">
+                        <i class="fas fa-fw fa-box-open"></i>
+                        <span>Pinjam Barang</span>
+                    </a>
+                </li>
+
+                <li class="nav-item {{ request()->is('mybookitem') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('mybookitem') }}">
+                        <i class="fas fa-fw fa-box"></i>
+                        <span>Peminjaman Barang Saya</span>
+                    </a>
+                </li>
+
+                <li class="nav-item {{ request()->is('report*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('report.index') }}">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Laporan New</span>
+                    </a>
+                </li>
 
                 {{-- ADMIN FAKULTAS --}}
             @elseif (auth()->user()->role === 'admin_fakultas')
