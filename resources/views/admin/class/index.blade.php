@@ -9,6 +9,20 @@
         <div class="alert alert-success" role="alert">{{ session('success') }}</div>
     @endif
 
+    @if (auth()->user()->role === 'superadmin')
+        <form method="GET" class="mb-3">
+            <select name="faculty_id" class="form-control" onchange="this.form.submit()">
+                <option value="">Semua Fakultas</option>
+                @foreach (\App\Models\Faculty::all() as $f)
+                    <option value="{{ $f->id }}" {{ request('faculty_id') == $f->id ? 'selected' : '' }}>
+                        {{ $f->name }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
+    @endif
+
+
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <a href="{{ route('class.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Tambah</a>

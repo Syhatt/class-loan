@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BookingClass;
 use App\Models\BookingItem;
+use App\Models\Faculty;
 use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +19,13 @@ class BookingItemController extends Controller
     public function index()
     {
         $pageTitle = 'Peminjaman Barang';
+
+        if (auth()->user()->role === 'superadmin') {
+            $item = Item::where('stock', '>', 0)->with('faculty')->get();
+            $faculties = Faculty::all();
+            return view('bookingitem.index', compact('pageTitle', 'item', 'faculties'));
+        }
+
         $item = Item::where('faculty_id', auth()->user()->faculty_id)->where('stock', '>', 0)->get();
 
         return view('bookingitem.index', compact('pageTitle', 'item'));

@@ -8,6 +8,26 @@
         <div class="alert alert-warning">Tidak ada kelas yang aktif untuk saat ini.</div>
     @endif
 
+    @if (auth()->user()->role === 'superadmin')
+        <form method="GET" class="mb-3">
+            <select name="faculty_id" class="form-control" onchange="this.form.submit()">
+                <option value="">Semua Fakultas</option>
+                @foreach ($faculties as $f)
+                    <option value="{{ $f->id }}" {{ request('faculty_id') == $f->id ? 'selected' : '' }}>
+                        {{ $f->name }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
+
+        @php
+            if (request('faculty_id')) {
+                $class = $class->where('faculty_id', request('faculty_id'));
+            }
+        @endphp
+    @endif
+
+
     <div class="row">
         @foreach ($class as $cls)
             <div class="col-md-3 mb-4">
@@ -20,8 +40,8 @@
                         @foreach ($images as $i => $img)
                             @if ($i < 3)
                                 <img src="{{ asset('storage/' . $img) }}" class="img-thumbnail previewable"
-                                    data-images="{{ implode(',', $images) }}" data-index="{{ $i }}" width="100"
-                                    height="100" style="object-fit: cover; cursor: pointer;">
+                                    data-images="{{ implode(',', $images) }}" data-index="{{ $i }}"
+                                    width="100" height="100" style="object-fit: cover; cursor: pointer;">
                             @endif
                         @endforeach
                         @if (count($images) > 3)
@@ -81,67 +101,3 @@
         });
     </script>
 @endsection
-
-
-{{-- @extends('layouts.master')
-@section('content')
-    <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">{{ $pageTitle }}</h1>
-    </div>
-
-    <div class="row">
-        @if ($class->isEmpty())
-            <div class="alert alert-warning">Tidak ada kelas yang aktif untuk saat ini.</div>
-        @endif
-
-        @foreach ($class as $class)
-            <div class="col">
-                <div class="card" style="width: 18rem;">
-                    @php
-                        $images = explode(',', $class->image);
-                    @endphp
-
-                    <div id="carousel{{ $class->id }}" class="carousel slide" data-ride="carousel">
-                        <div class="carousel-inner">
-                            @foreach ($images as $index => $img)
-                                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                                    <img src="{{ asset('storage/' . $img) }}" class="d-block w-100" alt="Foto Kelas">
-                                </div>
-                            @endforeach
-                        </div>
-                        @if (count($images) > 1)
-                            <a class="carousel-control-prev" href="#carousel{{ $class->id }}" role="button"
-                                data-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            </a>
-                            <a class="carousel-control-next" href="#carousel{{ $class->id }}" role="button"
-                                data-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            </a>
-                        @endif
-                    </div>
-
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $class->name }}</h5>
-                        <p class="card-text">{{ $class->desc }}</p>
-                        <a href="{{ route('booking.tambah', $class->id) }}" class="btn btn-info btn-sm">
-                            <i class="fas fa-bookmark"></i> Booking
-                        </a>
-                    </div>
-                </div>
-
-                <div class="card" style="width: 18rem;">
-                    <img src="{{ asset('storage/' . $class->image) }}" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $class->name }}</h5>
-                        <p class="card-text">{{ $class->desc }}</p>
-                        <a href="{{ route('booking.tambah', $class->id) }}" class="btn btn-info btn-sm"><i
-                                class="fas fa-bookmark"></i>
-                            Booking</a>
-                    </div>
-                </div>
-            </div>
-        @endforeach
-    </div>
-@endsection --}}
