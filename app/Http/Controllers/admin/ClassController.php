@@ -14,15 +14,28 @@ class ClassController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $pageTitle = 'Kelas';
 
-        if (auth()->user()->role == 'superadmin') {
-            $classes = Classmodel::with('faculty')->get();
-        } else {
-            $classes = Classmodel::where('faculty_id', auth()->user()->faculty_id)->get();
+        // Jika superadmin → bisa lihat semua + filter fakultas
+        if (auth()->user()->role === 'superadmin') {
+
+            // Ambil daftar fakultas untuk dropdown filter
+            $faculties = Faculty::all();
+
+            // Jika ada request filter fakultas
+            $classes = Classmodel::with('faculty')
+                ->when($request->faculty_id, function ($query) use ($request) {
+                    $query->where('faculty_id', $request->faculty_id);
+                })
+                ->get();
+
+            return view('admin.class.index', compact('pageTitle', 'classes', 'faculties'));
         }
+
+        // Jika admin fakultas → hanya lihat fakultasnya
+        $classes = Classmodel::where('faculty_id', auth()->user()->faculty_id)->get();
 
         return view('admin.class.index', compact('pageTitle', 'classes'));
     }

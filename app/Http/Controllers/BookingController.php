@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BookingClass;
 use App\Models\Classmodel;
+use App\Models\Faculty;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +19,16 @@ class BookingController extends Controller
     public function index()
     {
         $pageTitle = 'Peminjaman';
+
+        if (auth()->user()->role === 'superadmin') {
+            $class = Classmodel::where('is_available', true)
+                ->with('faculty')
+                ->get();
+
+            $faculties = Faculty::all(); // Untuk filter fakultas
+            return view('booking.index', compact('pageTitle', 'class', 'faculties'));
+        }
+
         $class = Classmodel::where('faculty_id', auth()->user()->faculty_id)->where('is_available', true)->get();
 
         return view('booking.index', compact('pageTitle', 'class'));
