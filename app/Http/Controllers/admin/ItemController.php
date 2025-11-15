@@ -27,11 +27,7 @@ class ItemController extends Controller
             return view('admin.item.index', compact('pageTitle', 'item', 'faculties'));
         }
 
-        // if (auth()->user()->role === 'superadmin') {
-        //     $item = Item::with('faculty')->get(); // tampil semua + fakultas
-        // } else {
-        //     $item = Item::where('faculty_id', auth()->user()->faculty_id)->get();
-        // }
+        $item = Item::where('faculty_id', auth()->user()->faculty_id)->get();
 
         return view('admin.item.index', compact('pageTitle', 'item'));
     }

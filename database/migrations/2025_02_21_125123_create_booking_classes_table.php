@@ -20,6 +20,8 @@ return new class extends Migration
             $table->date('end_date');
             $table->time('start_time');
             $table->time('end_time');
+            $table->dateTime('start_datetime');
+            $table->dateTime('end_datetime');
             $table->string('organization');
             $table->string('activity_name');
             $table->string('full_name');
