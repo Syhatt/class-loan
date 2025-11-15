@@ -150,7 +150,7 @@
                         @if ($nodin && $nodin->file_path)
                             <div class="alert alert-success text-center">
                                 <h5 class="mb-3">Peminjaman telah disetujui ✅</h5>
-                                <a href="{{ asset('storage/' . $nodin->file_path) }}" target="_blank"
+                                <a href="{{ asset($booking->nodin->file_path) }}" target="_blank"
                                     class="btn btn-primary btn-sm">
                                     <i class="fas fa-file-download"></i> Download Nota Dinas (PDF)
                                 </a>
