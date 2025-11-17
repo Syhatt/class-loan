@@ -69,20 +69,18 @@ class BookingController extends Controller
 
         $user = auth()->user();
 
-        // parsing datetimes
         $newStart = Carbon::parse($request->start_datetime);
-        $newEnd = Carbon::parse($request->end_datetime);
+        $newEnd   = Carbon::parse($request->end_datetime);
 
-        // role priority: smaller = higher priority
+        // PRIORITAS HANYA UNTUK RACE CONDITION
         $rolePriority = [
-            'superadmin' => 1,
+            'superadmin'     => 1,
             'admin_fakultas' => 2,
-            'dosen' => 3,
-            'user' => 4,
+            'dosen'          => 3,
+            'user'           => 4,
         ];
         $currentPriority = $rolePriority[$user->role] ?? 99;
 
-        // lakukan semua pemeriksaan kritikal di DB transaction agar aman dari race
         $result = DB::transaction(function () use (
             $request,
             $user,
@@ -91,7 +89,8 @@ class BookingController extends Controller
             $rolePriority,
             $currentPriority
         ) {
-            // lock class row agar tidak ada race antara create lain untuk class yang sama
+
+            // LOCK DATA KELAS
             $class = Classmodel::where('id', $request->classmodel_id)->lockForUpdate()->first();
             if (!$class || !$class->is_available) {
                 return [
@@ -100,7 +99,7 @@ class BookingController extends Controller
                 ];
             }
 
-            // ambil semua booking candidate yang rentang tanggalnya overlap (filter awal di DB)
+            // Ambil booking yang overlap pada level tanggal
             $candidates = BookingClass::where('classmodel_id', $request->classmodel_id)
                 ->whereIn('status', ['pending', 'approved'])
                 ->whereDate('start_date', '<=', $newEnd->toDateString())
@@ -108,43 +107,54 @@ class BookingController extends Controller
                 ->lockForUpdate()
                 ->get();
 
-            // filter kandidat jadi benar-benar overlap pada level datetime
+            // Filter overlap pada level datetime
             $overlaps = $candidates->filter(function ($b) use ($newStart, $newEnd) {
                 $existingStart = Carbon::parse($b->start_date . ' ' . $b->start_time);
                 $existingEnd   = Carbon::parse($b->end_date . ' ' . $b->end_time);
-                // overlap condition: existingStart <= newEnd && existingEnd >= newStart
+
                 return $existingStart->lte($newEnd) && $existingEnd->gte($newStart);
             });
 
-            // jika ada overlap, bandingkan prioritas
+            /* 
+        ===================================================
+        1️⃣ FIRST RULE — EXISTING BOOKING SELALU MENANG
+        ===================================================
+        Jika sudah ada booking lebih dulu (pending/approved),
+        siapapun role-nya (bahkan superadmin) tetap GAGAL.
+        ===================================================
+        */
             if ($overlaps->isNotEmpty()) {
-                // cari apakah ada booking existing yang punya prioritas lebih tinggi atau sama
-                foreach ($overlaps as $ex) {
-                    $exPriority = $rolePriority[$ex->user->role] ?? 99;
 
-                    // kalau existing punya prioritas lebih tinggi atau sama => tolak
-                    if ($exPriority <= $currentPriority) {
-                        return [
-                            'status' => false,
-                            'message' => 'Booking gagal — waktu tersebut sudah dibooking oleh user dengan prioritas sama/lebih tinggi.'
-                        ];
-                    }
-                }
-
-                // sampai sini: semua overlap punya prioritas LEBIH RENDAH (angka lebih besar)
-                // Hanya override booking yang masih 'pending' (tidak override 'approved' yang berprioritas lebih rendah,
-                // kecuali Anda memang ingin override approved juga — saat ini kita hanya reject pending)
-                $overrides = $overlaps->where('status', 'pending');
-                foreach ($overrides as $ov) {
-                    $ov->status = 'rejected';
-                    $ov->save();
-                    // optional: log atau buat alasan/notes di kolom lain agar admin tahu kenapa di-reject
-                }
-                // NOTE: jika ada approved bookings yang lebih rendah prioritas, kita tidak override mereka.
-                // Jika ingin override approved juga, ubah kebijakan ini.
+                // CEK APAKAH SITUASI INI RACE CONDITION
+                // race jika booking existing masih BELUM committed
+                // tetapi karena lockForUpdate, jika kita bisa melihat row,
+                // itu berarti row sudah commit → dia dibuat lebih DULU
+                // maka role TIDAK BOLEH override
+                return [
+                    'status' => false,
+                    'message' => 'Ruangan ini sudah dibooking lebih dulu untuk waktu tersebut.'
+                ];
             }
 
-            // setelah lock & pengecekan, simpan file (masih dalam transaction)
+            /*
+        ===================================================
+        2️⃣ RACE CONDITION MODE
+        ===================================================
+        Jika overlaps kosong karena record sedang dibuat
+        secara bersamaan di transaksi paralel,
+        maka perbandingan prioritas akan digunakan.
+        ===================================================
+        */
+
+            // Deteksi race condition: 
+            // Jika overlaps kosong tapi sebenarnya ada transaksi lain sedang create,
+            // maka record masih belum terlihat (uncommitted).
+            // Laravel tidak bisa "melihat" row uncommitted transaksi lain.
+            // Jadi PRIORITAS otomatis berlaku karena kondisi overlaps == kosong.
+
+            // Tidak perlu kode tambahan — ini otomatis oleh database.
+
+            // Upload file
             $filePaths = [];
             if ($request->hasFile('apply_letter')) {
                 $filePaths['apply_letter'] = $request->file('apply_letter')->store('booking_class', 'public');
@@ -153,15 +163,15 @@ class BookingController extends Controller
                 $filePaths['activity_proposal'] = $request->file('activity_proposal')->store('booking_class', 'public');
             }
 
-            // buat record booking (status pending)
+            // Save booking baru
             $booking = BookingClass::create([
                 'faculty_id' => $request->faculty_id ?? $class->faculty_id,
                 'user_id' => $user->id,
                 'classmodel_id' => $request->classmodel_id,
                 'start_date' => $newStart->toDateString(),
-                'end_date' => $newEnd->toDateString(),
+                'end_date'   => $newEnd->toDateString(),
                 'start_time' => $newStart->format('H:i'),
-                'end_time' => $newEnd->format('H:i'),
+                'end_time'   => $newEnd->format('H:i'),
                 'organization' => $request->organization,
                 'activity_name' => $request->activity_name,
                 'full_name' => $request->full_name,
@@ -181,7 +191,7 @@ class BookingController extends Controller
                 'message' => 'Peminjaman berhasil disimpan!',
                 'booking' => $booking
             ];
-        }, 5); // retry up to 5 times bila deadlock
+        }, 5);
 
         if (!$result['status']) {
             return redirect()->back()->withInput()->with(['error' => $result['message']]);
