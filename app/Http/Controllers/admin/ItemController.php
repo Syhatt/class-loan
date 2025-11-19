@@ -17,19 +17,15 @@ class ItemController extends Controller
         $pageTitle = 'Barang';
 
         if (auth()->user()->role === 'superadmin') {
-            $item = Item::with('faculty')->get();
-
-            if (request('faculty_id')) {
-                $item = $item->where('faculty_id', request('faculty_id'));
-            }
-
+            $items = Item::with('faculty')->when(request('faculty_id'), function ($q) {
+                $q->where('faculty_id', request('faculty_id'));
+            })->get();
             $faculties = Faculty::all();
-            return view('admin.item.index', compact('pageTitle', 'item', 'faculties'));
+            return view('admin.item.index', compact('pageTitle', 'items', 'faculties'));
         }
 
-        $item = Item::where('faculty_id', auth()->user()->faculty_id)->get();
-
-        return view('admin.item.index', compact('pageTitle', 'item'));
+        $items = Item::where('faculty_id', auth()->user()->faculty_id)->get();
+        return view('admin.item.index', compact('pageTitle', 'items'));
     }
 
     /**
@@ -55,12 +51,11 @@ class ItemController extends Controller
         $request->validate([
             'name' => 'required',
             'desc' => 'required',
-            'stock' => 'required',
+            'stock' => 'required|integer|min:0',
+            'faculty_id' => auth()->user()->role === 'superadmin' ? 'required|exists:faculties,id' : 'nullable'
         ]);
 
-        $facultyId = auth()->user()->role === 'superadmin'
-            ? $request->faculty_id
-            : auth()->user()->faculty_id;
+        $facultyId = auth()->user()->role === 'superadmin' ? $request->faculty_id : auth()->user()->faculty_id;
 
         Item::create([
             'faculty_id' => $facultyId,
@@ -69,7 +64,7 @@ class ItemController extends Controller
             'stock' => $request->stock,
         ]);
 
-        return redirect()->route('item.index')->with(['success' => 'Data Berhasil Disimpan!']);
+        return redirect()->route('item.index')->with('success', 'Data Berhasil Disimpan!');
     }
 
     /**
@@ -99,19 +94,17 @@ class ItemController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required',
             'desc' => 'required',
-            'stock' => 'required',
+            'stock' => 'required|integer|min:0',
+            'faculty_id' => auth()->user()->role === 'superadmin' ? 'required|exists:faculties,id' : 'nullable'
         ]);
 
         $item = Item::findOrFail($id);
-
-        $facultyId = auth()->user()->role === 'superadmin'
-            ? $request->faculty_id
-            : auth()->user()->faculty_id;
+        $facultyId = auth()->user()->role === 'superadmin' ? $request->faculty_id : auth()->user()->faculty_id;
 
         $item->update([
             'faculty_id' => $facultyId,
@@ -120,7 +113,7 @@ class ItemController extends Controller
             'stock' => $request->stock,
         ]);
 
-        return redirect()->route('item.index')->with(['success' => 'Data Berhasil Diubah!']);
+        return redirect()->route('item.index')->with('success', 'Data Berhasil Diubah!');
     }
 
     /**

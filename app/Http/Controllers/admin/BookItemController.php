@@ -27,8 +27,7 @@ class BookItemController extends Controller
     {
         $pageTitle = 'Detail Peminjaman Barang';
 
-        $booking = BookingItem::with(['item', 'user', 'bookingClass'])
-            ->findOrFail($id);
+        $booking = BookingItem::with(['item', 'user', 'bookingClass'])->findOrFail($id);
 
         return view('admin.bookitem.show', compact('pageTitle', 'booking'));
     }
@@ -41,35 +40,30 @@ class BookItemController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
         $booking = BookingItem::findOrFail($id);
 
         $request->validate([
-            'status' => 'required|in:approved,rejected',
+            'status' => 'required|in:approved,rejected,returned',
             'nama_kabag' => 'nullable|string|max:255',
             'nip_kabag' => 'nullable|string|max:100',
             'ttd_kabag' => 'nullable|file|mimes:png,jpg,jpeg|max:2048',
         ]);
 
         if ($request->status === 'approved') {
-            // Validasi jika approve harus ada data kabag
             $request->validate([
                 'nama_kabag' => 'required|string|max:255',
                 'nip_kabag' => 'required|string|max:100',
                 'ttd_kabag' => 'required|file|mimes:png,jpg,jpeg|max:2048',
             ]);
 
-            // Upload ttd kabag
+            // upload ttd
             $signaturePath = null;
             if ($request->hasFile('ttd_kabag')) {
                 $signaturePath = $request->file('ttd_kabag')->store('signatures', 'public');
             }
 
-            // Generate surat pernyataan kesanggupan otomatis
             try {
                 $pdfRelativePath = NodinBarangGenerator::generate(
                     $booking,
@@ -78,7 +72,6 @@ class BookItemController extends Controller
                     $signaturePath
                 );
 
-                // Update status dan simpan path nodin ke database
                 $booking->update([
                     'status' => 'approved',
                     'nodin_barang' => $pdfRelativePath
@@ -86,14 +79,80 @@ class BookItemController extends Controller
             } catch (\Exception $e) {
                 return redirect()->back()->with(['error' => 'Gagal generate surat: ' . $e->getMessage()]);
             }
-        } else {
-            // Jika reject, hanya update status
+        } elseif ($request->status === 'rejected') {
+            // kembalikan stok jika sebelumnya sudah dikurangi (bila diperlukan)
+            if ($booking->status === 'pending' || $booking->status === 'approved') {
+                $item = $booking->item;
+                $item->stock += $booking->qty;
+                $item->save();
+            }
             $booking->update(['status' => 'rejected']);
+        } elseif ($request->status === 'returned') {
+            // ketika barang dikembalikan oleh user -> naikkan stok dan update status
+            if ($booking->status !== 'returned') {
+                $item = $booking->item;
+                $item->stock += $booking->qty;
+                $item->save();
+            }
+            $booking->update(['status' => 'returned']);
         }
-        // dd($request->all());
 
         return redirect()->route('bookitem.index')->with(['success' => 'Data berhasil diperbarui!']);
     }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    // public function update(Request $request, string $id)
+    // {
+    //     $booking = BookingItem::findOrFail($id);
+
+    //     $request->validate([
+    //         'status' => 'required|in:approved,rejected',
+    //         'nama_kabag' => 'nullable|string|max:255',
+    //         'nip_kabag' => 'nullable|string|max:100',
+    //         'ttd_kabag' => 'nullable|file|mimes:png,jpg,jpeg|max:2048',
+    //     ]);
+
+    //     if ($request->status === 'approved') {
+    //         // Validasi jika approve harus ada data kabag
+    //         $request->validate([
+    //             'nama_kabag' => 'required|string|max:255',
+    //             'nip_kabag' => 'required|string|max:100',
+    //             'ttd_kabag' => 'required|file|mimes:png,jpg,jpeg|max:2048',
+    //         ]);
+
+    //         // Upload ttd kabag
+    //         $signaturePath = null;
+    //         if ($request->hasFile('ttd_kabag')) {
+    //             $signaturePath = $request->file('ttd_kabag')->store('signatures', 'public');
+    //         }
+
+    //         // Generate surat pernyataan kesanggupan otomatis
+    //         try {
+    //             $pdfRelativePath = NodinBarangGenerator::generate(
+    //                 $booking,
+    //                 $request->nama_kabag,
+    //                 $request->nip_kabag,
+    //                 $signaturePath
+    //             );
+
+    //             // Update status dan simpan path nodin ke database
+    //             $booking->update([
+    //                 'status' => 'approved',
+    //                 'nodin_barang' => $pdfRelativePath
+    //             ]);
+    //         } catch (\Exception $e) {
+    //             return redirect()->back()->with(['error' => 'Gagal generate surat: ' . $e->getMessage()]);
+    //         }
+    //     } else {
+    //         // Jika reject, hanya update status
+    //         $booking->update(['status' => 'rejected']);
+    //     }
+    //     // dd($request->all());
+
+    //     return redirect()->route('bookitem.index')->with(['success' => 'Data berhasil diperbarui!']);
+    // }
 
     /**
      * Remove the specified resource from storage (optional, jika diperlukan).
