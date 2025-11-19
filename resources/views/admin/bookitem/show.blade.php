@@ -34,6 +34,8 @@
                     <td>
                         @if ($booking->status == 'approved')
                             <span class="badge badge-success">Disetujui</span>
+                        @elseif($booking->status == 'returned')
+                            <span class="badge badge-info">Dikembalikan</span>
                         @elseif($booking->status == 'rejected')
                             <span class="badge badge-danger">Ditolak</span>
                         @else
@@ -152,7 +154,7 @@
                         </form>
                     </div>
                 </div>
-            @elseif ($booking->status === 'approved')
+            @elseif ($booking->status === 'approved' || $booking->status === 'returned')
                 <div class="alert alert-success mt-4">
                     <h5 class="mb-3">✅ Peminjaman Telah Disetujui</h5>
                     @if ($booking->nodin_barang)
