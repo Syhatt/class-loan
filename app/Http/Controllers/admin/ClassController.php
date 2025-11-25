@@ -8,6 +8,7 @@ use App\Models\Faculty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class ClassController extends Controller
 {
@@ -75,31 +76,52 @@ class ClassController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'faculty_id' => 'required',
-            'name'       => 'required',
+    $request->validate(
+        [
+            'faculty_id' => 'required|exists:faculties,id',
+            'name'       => [
+                'required',
+                // nama kelas unik per fakultas
+                Rule::unique('classmodels')->where(function ($q) use ($request) {
+                    return $q->where('faculty_id', $request->faculty_id);
+                }),
+            ],
             'desc'       => 'required',
             'image.*'    => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        ],
+        [
+            'faculty_id.required' => 'Fakultas wajib dipilih.',
+            'faculty_id.exists'   => 'Fakultas tidak valid.',
+            'name.required'       => 'Nama kelas wajib diisi.',
+            'name.unique'         => 'Nama kelas tersebut sudah ada di fakultas ini.',
+            'desc.required'       => 'Deskripsi kelas wajib diisi.',
+            'image.*.required'    => 'Foto kelas wajib diunggah.',
+            'image.*.image'       => 'File foto harus berupa gambar.',
+            'image.*.mimes'       => 'Foto harus berformat jpeg, png, jpg, atau gif.',
+            'image.*.max'         => 'Ukuran foto maksimal 2MB.',
+        ]
+    );
 
-        $imagePaths = [];
+    $imagePaths = [];
 
-        if ($request->hasFile('image')) {
-            foreach ($request->file('image') as $file) {
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $path     = $file->storeAs('images', $filename, 'public');
-                $imagePaths[] = $path;
-            }
+    if ($request->hasFile('image')) {
+        foreach ($request->file('image') as $file) {
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path     = $file->storeAs('images', $filename, 'public');
+            $imagePaths[] = $path;
         }
+    }
 
-        Classmodel::create([
-            'faculty_id' => $request->faculty_id,
-            'name'       => $request->name,
-            'desc'       => $request->desc,
-            'image'      => implode(',', $imagePaths),
-        ]);
+    Classmodel::create([
+        'faculty_id' => $request->faculty_id,
+        'name'       => $request->name,
+        'desc'       => $request->desc,
+        'image'      => implode(',', $imagePaths),
+    ]);
 
-        return redirect()->route('class.index')->with(['success' => 'Data Berhasil Ditambahkan!']);
+    return redirect()
+        ->route('class.index')
+        ->with('success', 'Data kelas berhasil ditambahkan!');
     }
 
     /**
@@ -126,13 +148,31 @@ class ClassController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'name'     => 'required',
-            'desc'     => 'required',
-            'image.*'  => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
         $class = Classmodel::findOrFail($id);
+
+        $request->validate(
+            [
+                'name' => [
+                    'required',
+                    // nama kelas harus unik per fakultas, kecuali dirinya sendiri
+                    Rule::unique('classmodels')
+                        ->where(function ($q) use ($class) {
+                            return $q->where('faculty_id', $class->faculty_id);
+                        })
+                        ->ignore($class->id),
+                ],
+                'desc'    => 'required',
+                'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ],
+            [
+                'name.required'   => 'Nama kelas wajib diisi.',
+                'name.unique'     => 'Nama kelas tersebut sudah ada di fakultas ini.',
+                'desc.required'   => 'Deskripsi kelas wajib diisi.',
+                'image.*.image'   => 'File foto harus berupa gambar.',
+                'image.*.mimes'   => 'Foto harus berformat jpeg, png, jpg, atau gif.',
+                'image.*.max'     => 'Ukuran foto maksimal 2MB.',
+            ]
+        );
 
         // Ambil semua gambar lama (kalau kosong, jadikan array kosong)
         $imagePaths = [];
@@ -156,7 +196,7 @@ class ClassController extends Controller
             'image' => implode(',', $imagePaths),
         ]);
 
-        return redirect()->route('class.edit', $id)->with('success', 'Data berhasil diperbarui!');
+        return redirect()->route('class.edit', $id)->with('success', 'Data kelas berhasil diperbarui!');
     }
 
     /**
@@ -203,6 +243,6 @@ class ClassController extends Controller
 
         $class->delete();
 
-        return redirect()->route('class.index')->with(['success' => 'Data Berhasil Hapus!']);
+        return redirect()->route('class.index')->with(['success' => 'Data kelas berhasil dihapus!']);
     }
 }

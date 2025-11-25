@@ -17,14 +17,19 @@ class ItemController extends Controller
         $pageTitle = 'Barang';
 
         if (auth()->user()->role === 'superadmin') {
-            $items = Item::with('faculty')->when(request('faculty_id'), function ($q) {
-                $q->where('faculty_id', request('faculty_id'));
-            })->get();
+            $items = Item::with('faculty')
+                ->when(request('faculty_id'), function ($q) {
+                    $q->where('faculty_id', request('faculty_id'));
+                })
+                ->get();
+
             $faculties = Faculty::all();
+
             return view('admin.item.index', compact('pageTitle', 'items', 'faculties'));
         }
 
         $items = Item::where('faculty_id', auth()->user()->faculty_id)->get();
+
         return view('admin.item.index', compact('pageTitle', 'items'));
     }
 
@@ -48,23 +53,51 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
+        // tentukan faculty_id yang dipakai
+        $facultyId = auth()->user()->role === 'superadmin'
+            ? $request->faculty_id
+            : auth()->user()->faculty_id;
+
         $request->validate([
-            'name' => 'required',
+            'name' => [
+                'required',
+                function ($attribute, $value, $fail) use ($facultyId) {
+                    if (!$facultyId) {
+                        return;
+                    }
+
+                    $exists = Item::where('name', $value)
+                        ->where('faculty_id', $facultyId)
+                        ->exists();
+
+                    if ($exists) {
+                        $fail("Barang dengan nama '$value' sudah ada di fakultas tersebut.");
+                    }
+                },
+            ],
             'desc' => 'required',
             'stock' => 'required|integer|min:0',
-            'faculty_id' => auth()->user()->role === 'superadmin' ? 'required|exists:faculties,id' : 'nullable'
+            'faculty_id' => auth()->user()->role === 'superadmin'
+                ? 'required|exists:faculties,id'
+                : 'nullable',
+        ], [
+            'name.required'       => 'Nama barang wajib diisi.',
+            'desc.required'       => 'Deskripsi barang wajib diisi.',
+            'stock.required'      => 'Stok barang wajib diisi.',
+            'stock.integer'       => 'Stok barang harus berupa angka.',
+            'stock.min'           => 'Stok barang minimal 0.',
+            'faculty_id.required' => 'Fakultas wajib dipilih.',
+            'faculty_id.exists'   => 'Fakultas tidak valid.',
         ]);
-
-        $facultyId = auth()->user()->role === 'superadmin' ? $request->faculty_id : auth()->user()->faculty_id;
 
         Item::create([
             'faculty_id' => $facultyId,
-            'name' => $request->name,
-            'desc' => $request->desc,
-            'stock' => $request->stock,
+            'name'       => $request->name,
+            'desc'       => $request->desc,
+            'stock'      => $request->stock,
         ]);
 
-        return redirect()->route('item.index')->with('success', 'Data Berhasil Disimpan!');
+        return redirect()->route('item.index')->with('success', 'Data barang berhasil disimpan!');
     }
 
     /**
@@ -81,7 +114,7 @@ class ItemController extends Controller
     public function edit(string $id)
     {
         $pageTitle = 'Edit Barang';
-        $item = Item::find($id);
+        $item = Item::findOrFail($id);
 
         if (auth()->user()->role === 'superadmin') {
             $faculties = Faculty::all();
@@ -96,24 +129,54 @@ class ItemController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $item = Item::findOrFail($id);
+
+        // tentukan faculty_id baru
+        $facultyId = auth()->user()->role === 'superadmin'
+            ? $request->faculty_id
+            : auth()->user()->faculty_id;
+
         $request->validate([
-            'name' => 'required',
+            'name' => [
+                'required',
+                function ($attribute, $value, $fail) use ($facultyId, $id) {
+                    if (!$facultyId) {
+                        return;
+                    }
+
+                    $exists = Item::where('name', $value)
+                        ->where('faculty_id', $facultyId)
+                        ->where('id', '!=', $id) // abaikan dirinya sendiri
+                        ->exists();
+
+                    if ($exists) {
+                        $fail("Barang dengan nama '$value' sudah ada di fakultas tersebut.");
+                    }
+                },
+            ],
             'desc' => 'required',
             'stock' => 'required|integer|min:0',
-            'faculty_id' => auth()->user()->role === 'superadmin' ? 'required|exists:faculties,id' : 'nullable'
+            'faculty_id' => auth()->user()->role === 'superadmin'
+                ? 'required|exists:faculties,id'
+                : 'nullable',
+        ], [
+            'name.required'       => 'Nama barang wajib diisi.',
+            'desc.required'       => 'Deskripsi barang wajib diisi.',
+            'stock.required'      => 'Stok barang wajib diisi.',
+            'stock.integer'       => 'Stok barang harus berupa angka.',
+            'stock.min'           => 'Stok barang minimal 0.',
+            'faculty_id.required' => 'Fakultas wajib dipilih.',
+            'faculty_id.exists'   => 'Fakultas tidak valid.',
         ]);
-
-        $item = Item::findOrFail($id);
-        $facultyId = auth()->user()->role === 'superadmin' ? $request->faculty_id : auth()->user()->faculty_id;
 
         $item->update([
             'faculty_id' => $facultyId,
-            'name' => $request->name,
-            'desc' => $request->desc,
-            'stock' => $request->stock,
+            'name'       => $request->name,
+            'desc'       => $request->desc,
+            'stock'      => $request->stock,
         ]);
 
-        return redirect()->route('item.index')->with('success', 'Data Berhasil Diubah!');
+        return redirect()->route('item.index')->with('success', 'Data barang berhasil diubah!');
     }
 
     /**
@@ -123,6 +186,6 @@ class ItemController extends Controller
     {
         Item::findOrFail($id)->delete();
 
-        return redirect()->route('item.index')->with(['success' => 'Data Berhasil Diubah!']);
+        return redirect()->route('item.index')->with(['success' => 'Data barang berhasil dihapus!']);
     }
 }
