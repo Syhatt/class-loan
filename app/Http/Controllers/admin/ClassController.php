@@ -40,6 +40,9 @@ class ClassController extends Controller
         return view('admin.class.index', compact('pageTitle', 'classes'));
     }
 
+    /**
+     * Toggle status aktif / tidak aktif kelas
+     */
     public function toggleStatus($id)
     {
         $class = Classmodel::findOrFail($id);
@@ -74,28 +77,29 @@ class ClassController extends Controller
     {
         $request->validate([
             'faculty_id' => 'required',
-            'name' => 'required',
-            'desc' => 'required',
-            'image.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'name'       => 'required',
+            'desc'       => 'required',
+            'image.*'    => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $imagePaths = [];
+
         if ($request->hasFile('image')) {
             foreach ($request->file('image') as $file) {
                 $filename = time() . '_' . $file->getClientOriginalName();
-                $path = $file->storeAs('images', $filename, 'public');
+                $path     = $file->storeAs('images', $filename, 'public');
                 $imagePaths[] = $path;
             }
         }
 
         Classmodel::create([
             'faculty_id' => $request->faculty_id,
-            'name' => $request->name,
-            'desc' => $request->desc,
-            'image' => implode(',', $imagePaths),
+            'name'       => $request->name,
+            'desc'       => $request->desc,
+            'image'      => implode(',', $imagePaths),
         ]);
 
-        return redirect()->route('class.index')->with(['success' => 'Data Berhasil Disimpan!']);
+        return redirect()->route('class.index')->with(['success' => 'Data Berhasil Ditambahkan!']);
     }
 
     /**
@@ -103,7 +107,7 @@ class ClassController extends Controller
      */
     public function show(string $id)
     {
-        //
+        // jika suatu saat butuh detail kelas
     }
 
     /**
@@ -112,7 +116,7 @@ class ClassController extends Controller
     public function edit(string $id)
     {
         $pageTitle = 'Edit Kelas';
-        $classes = Classmodel::find($id);
+        $classes   = Classmodel::findOrFail($id);
 
         return view('admin.class.edit', compact('pageTitle', 'classes'));
     }
@@ -123,28 +127,32 @@ class ClassController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'name' => 'required',
-            'desc' => 'required',
-            'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'name'     => 'required',
+            'desc'     => 'required',
+            'image.*'  => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $class = Classmodel::findOrFail($id);
 
-        // ambil semua gambar lama
-        $imagePaths = explode(',', $class->image);
+        // Ambil semua gambar lama (kalau kosong, jadikan array kosong)
+        $imagePaths = [];
 
-        // kalau ada file baru, tambahkan
+        if (!empty($class->image)) {
+            $imagePaths = explode(',', $class->image);
+        }
+
+        // Kalau ada file baru, tambahkan
         if ($request->hasFile('image')) {
             foreach ($request->file('image') as $file) {
                 $filename = time() . '_' . $file->getClientOriginalName();
-                $path = $file->storeAs('images', $filename, 'public');
+                $path     = $file->storeAs('images', $filename, 'public');
                 $imagePaths[] = $path;
             }
         }
 
         $class->update([
-            'name' => $request->name,
-            'desc' => $request->desc,
+            'name'  => $request->name,
+            'desc'  => $request->desc,
             'image' => implode(',', $imagePaths),
         ]);
 
@@ -157,7 +165,11 @@ class ClassController extends Controller
     public function deleteImage($id, $index)
     {
         $class = Classmodel::findOrFail($id);
-        $images = explode(',', $class->image);
+
+        $images = [];
+        if (!empty($class->image)) {
+            $images = explode(',', $class->image);
+        }
 
         if (isset($images[$index])) {
             // Hapus dari storage
@@ -166,7 +178,7 @@ class ClassController extends Controller
             // Hapus dari array
             unset($images[$index]);
 
-            // Simpan ulang string baru
+            // Susun ulang index & simpan string baru
             $class->image = implode(',', array_values($images));
             $class->save();
         }
@@ -179,7 +191,17 @@ class ClassController extends Controller
      */
     public function destroy(string $id)
     {
-        Classmodel::findOrFail($id)->delete();
+        $class = Classmodel::findOrFail($id);
+
+        // Opsional: sekalian hapus file gambarnya dari storage
+        if (!empty($class->image)) {
+            $images = explode(',', $class->image);
+            foreach ($images as $img) {
+                Storage::disk('public')->delete($img);
+            }
+        }
+
+        $class->delete();
 
         return redirect()->route('class.index')->with(['success' => 'Data Berhasil Hapus!']);
     }

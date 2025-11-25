@@ -7,10 +7,8 @@ use App\Models\BookingItem;
 use App\Models\Faculty;
 use App\Models\Item;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
-use function Laravel\Prompts\alert;
+use Carbon\Carbon;
 
 class BookingItemController extends Controller
 {
@@ -22,12 +20,19 @@ class BookingItemController extends Controller
         $pageTitle = 'Peminjaman Barang';
 
         if (auth()->user()->role === 'superadmin') {
-            $item = Item::where('stock', '>', 0)->with('faculty')->get();
+            $item = Item::where('stock', '>', 0)
+                ->with('faculty')
+                ->get();
+
             $faculties = Faculty::all();
+
             return view('bookingitem.index', compact('pageTitle', 'item', 'faculties'));
         }
 
-        $item = Item::where('faculty_id', auth()->user()->faculty_id)->where('stock', '>', 0)->get();
+        $item = Item::where('faculty_id', auth()->user()->faculty_id)
+            ->where('stock', '>', 0)
+            ->get();
+
         return view('bookingitem.index', compact('pageTitle', 'item'));
     }
 
@@ -39,7 +44,7 @@ class BookingItemController extends Controller
         $pageTitle = 'Form Peminjaman Barang';
         $items = Item::findOrFail($id);
 
-        // ambil semua peminjaman ruangan yg sudah approved milik mahasiswa ini
+        // ambil semua peminjaman ruangan yg sudah approved milik user ini
         $approvedRooms = BookingClass::where('user_id', auth()->id())
             ->where('status', 'approved')
             ->get();
@@ -47,29 +52,93 @@ class BookingItemController extends Controller
         return view('bookingitem.create', compact('pageTitle', 'items', 'approvedRooms'));
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
-        $request->validate([
-            'item_id' => 'required|exists:items,id',
-            'qty' => 'required|integer|min:1',
-            'booking_class_id' => 'required|exists:booking_classes,id',
-            'hari_pengembalian' => 'required|string|max:100',
-            'tanggal_pengembalian' => 'required|date',
-            'jam_pengembalian' => 'required|date_format:H:i',
-        ]);
+        // VALIDASI AWAL (tanpa hari_pengembalian, hari dihitung otomatis dari tanggal)
+        $request->validate(
+            [
+                'item_id'              => 'required|exists:items,id',
+                'qty'                  => 'required|integer|min:1',
+                'booking_class_id'     => 'required|exists:booking_classes,id',
+                'tanggal_pengembalian' => 'required|date',
+                'jam_pengembalian'     => 'required|date_format:H:i',
+            ],
+            [
+                'item_id.required'          => 'Barang wajib dipilih.',
+                'item_id.exists'            => 'Data barang tidak valid.',
+                'qty.required'              => 'Jumlah barang wajib diisi.',
+                'qty.integer'               => 'Jumlah harus berupa angka.',
+                'qty.min'                   => 'Jumlah minimal 1.',
+                'booking_class_id.required' => 'Ruangan / acara wajib dipilih.',
+                'booking_class_id.exists'   => 'Data ruangan / acara tidak valid.',
+                'tanggal_pengembalian.required' => 'Tanggal pengembalian wajib diisi.',
+                'tanggal_pengembalian.date'     => 'Format tanggal pengembalian tidak valid.',
+                'jam_pengembalian.required' => 'Jam pengembalian wajib diisi.',
+                'jam_pengembalian.date_format' => 'Format jam pengembalian tidak valid (HH:ii).',
+            ]
+        );
 
         $user = auth()->user();
 
-        // role priority
-        $rolePriority = [
-            'superadmin' => 1,
-            'admin_fakultas' => 2,
-            'dosen' => 3,
-            'user' => 4,
-        ];
-        $currentPriority = $rolePriority[$user->role] ?? 99;
+        // CEK ITEM + STOK (awal, sebelum transaksi, utk error yg rapi di qty)
+        $item = Item::find($request->item_id);
+        if (!$item) {
+            return back()
+                ->withErrors(['item_id' => 'Barang tidak ditemukan.'])
+                ->withInput();
+        }
 
-        $result = DB::transaction(function () use ($request, $user, $rolePriority, $currentPriority) {
+        if ($request->qty > $item->stock) {
+            return back()
+                ->withErrors([
+                    'qty' => 'Jumlah yang diminta melebihi stok yang tersedia (stok: ' . $item->stock . ').',
+                ])
+                ->withInput();
+        }
+
+        // PETA HARI DALAM BAHASA INDONESIA (ISO: 1=Senin ... 7=Minggu)
+        $hariArray = [
+            1 => 'Senin',
+            2 => 'Selasa',
+            3 => 'Rabu',
+            4 => 'Kamis',
+            5 => 'Jumat',
+        ];
+
+        // CEK HANYA HARI KERJA (SENIN–JUMAT)
+        $tanggal = Carbon::parse($request->tanggal_pengembalian);
+        $dayIndex = $tanggal->dayOfWeekIso; // 1=Mon ... 7=Sun
+
+        if ($dayIndex > 5) {
+            return back()
+                ->withErrors([
+                    'tanggal_pengembalian' => 'Pengembalian hanya dapat dilakukan pada hari kerja (Senin sampai Jumat).',
+                ])
+                ->withInput();
+        }
+
+        // HITUNG HARI PENGEMBALIAN OTOMATIS
+        $hari_pengembalian = $hariArray[$dayIndex];
+
+        // CEK JAM 07:00–15:00
+        $jam = Carbon::createFromFormat('H:i', $request->jam_pengembalian);
+        $start = Carbon::createFromTime(7, 0, 0);   // 07:00
+        $end   = Carbon::createFromTime(15, 0, 0);  // 15:00
+
+        if ($jam->lt($start) || $jam->gt($end)) {
+            return back()
+                ->withErrors([
+                    'jam_pengembalian' => 'Jam pengembalian hanya diperbolehkan antara pukul 07.00 sampai 15.00.',
+                ])
+                ->withInput();
+        }
+
+        // SIMPAN DENGAN TRANSAKSI (untuk jaga-jaga race condition stok)
+        $result = DB::transaction(function () use ($request, $user, $hari_pengembalian) {
+
             // pastikan ruangan yang dipilih milik user dan sudah approved
             $approvedRoom = BookingClass::where('id', $request->booking_class_id)
                 ->where('user_id', $user->id)
@@ -78,44 +147,34 @@ class BookingItemController extends Controller
                 ->first();
 
             if (!$approvedRoom) {
-                return ['status' => false, 'message' => 'Anda harus memiliki peminjaman ruangan yang telah disetujui.'];
+                return [
+                    'status'  => false,
+                    'field'   => null,
+                    'message' => 'Anda harus memiliki peminjaman ruangan yang telah disetujui.',
+                ];
             }
 
-            // lock item
+            // lock item supaya stok aman
             $item = Item::where('id', $request->item_id)->lockForUpdate()->first();
-            if (!$item) return ['status' => false, 'message' => 'Barang tidak ditemukan.'];
-            if ($item->stock < $request->qty) return ['status' => false, 'message' => 'Stok barang tidak mencukupi.'];
-
-            // ambil existing booking item untuk booking_class yang sama & item yang sama
-            $existing = BookingItem::where('item_id', $request->item_id)
-                ->where('booking_classes_id', $request->booking_class_id)
-                ->whereIn('status', ['pending', 'approved'])
-                ->lockForUpdate()
-                ->get();
-
-            if ($existing->isNotEmpty()) {
-                // jika ada APPROVED dengan prioritas <= current -> reject
-                foreach ($existing as $ex) {
-                    if ($ex->status === 'approved') {
-                        $exPriority = $rolePriority[$ex->user->role] ?? 99;
-                        if ($exPriority <= $currentPriority) {
-                            return ['status' => false, 'message' => 'Barang sedang digunakan oleh pemohon lain yang sudah disetujui.'];
-                        }
-                    }
-                }
-
-                // untuk PENDING: override bila current memiliki prioritas lebih tinggi
-                $pending = $existing->where('status', 'pending');
-                foreach ($pending as $p) {
-                    $pPriority = $rolePriority[$p->user->role] ?? 99;
-                    if ($currentPriority < $pPriority) {
-                        $p->status = 'rejected';
-                        $p->save();
-                    } else {
-                        return ['status' => false, 'message' => 'Barang sedang dipesan oleh pemohon lain dengan prioritas sama/lebih tinggi.'];
-                    }
-                }
+            if (!$item) {
+                return [
+                    'status'  => false,
+                    'field'   => 'item_id',
+                    'message' => 'Barang tidak ditemukan.',
+                ];
             }
+
+            // CEK STOK LAGI DI DALAM TRANSAKSI
+            if ($item->stock < $request->qty) {
+                return [
+                    'status'  => false,
+                    'field'   => 'qty',
+                    'message' => 'Stok barang tidak mencukupi. Stok tersisa: ' . $item->stock . '.',
+                ];
+            }
+
+            // ❌ TIDAK ADA LAGI LOGIKA CEK BOOKINGITEM EXISTING / PRIORITAS
+            // Selama stok cukup, boleh dipinjam oleh peminjam lain.
 
             // kurangi stok
             $item->stock -= $request->qty;
@@ -123,134 +182,41 @@ class BookingItemController extends Controller
 
             // simpan booking item
             BookingItem::create([
-                'faculty_id' => $request->faculty_id ?? $item->faculty_id,
-                'user_id' => $user->id,
-                'booking_classes_id' => $request->booking_class_id,
-                'item_id' => $request->item_id,
-                'qty' => $request->qty,
-                'hari_pengembalian' => $request->hari_pengembalian,
+                'faculty_id'           => $request->faculty_id ?? $item->faculty_id,
+                'user_id'              => $user->id,
+                'booking_classes_id'   => $request->booking_class_id,
+                'item_id'              => $request->item_id,
+                'qty'                  => $request->qty,
+                'hari_pengembalian'    => $hari_pengembalian,
                 'tanggal_pengembalian' => $request->tanggal_pengembalian,
-                'jam_pengembalian' => $request->jam_pengembalian,
-                'status' => 'pending',
+                'jam_pengembalian'     => $request->jam_pengembalian,
+                'status'               => 'pending',
             ]);
 
-            return ['status' => true, 'message' => 'Peminjaman barang berhasil disimpan!'];
+            return [
+                'status'  => true,
+                'field'   => null,
+                'message' => 'Peminjaman barang berhasil disimpan!',
+            ];
         }, 5);
 
+        // HANDLE GAGAL DARI TRANSAKSI
         if (!$result['status']) {
-            return redirect()->back()->withInput()->with(['error' => $result['message']]);
+            if (!empty($result['field'])) {
+                return redirect()
+                    ->back()
+                    ->withErrors([$result['field'] => $result['message']])
+                    ->withInput();
+            }
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with(['error' => $result['message']]);
         }
 
-        return redirect()->route('bookingitem.index')->with(['success' => $result['message']]);
+        return redirect()
+            ->route('bookingitem.index')
+            ->with(['success' => $result['message']]);
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'item_id' => 'required|exists:items,id',
-    //         'qty' => 'required|integer|min:1',
-    //         'booking_class_id' => 'required|exists:booking_classes,id',
-    //         'hari_pengembalian' => 'required|string|max:100',
-    //         'tanggal_pengembalian' => 'required|date',
-    //         'jam_pengembalian' => 'required|date_format:H:i',
-    //     ]);
-
-    //     $user = auth()->user();
-
-    //     // role priority
-    //     $rolePriority = [
-    //         'superadmin' => 1,
-    //         'admin_fakultas' => 2,
-    //         'dosen' => 3,
-    //         'user' => 4,
-    //     ];
-    //     $currentPriority = $rolePriority[$user->role] ?? 99;
-
-    //     $result = DB::transaction(function () use ($request, $user, $rolePriority, $currentPriority) {
-
-    //         // Pastikan ruangan yang dipilih benar-benar milik user & approved
-    //         $approvedRoom = BookingClass::where('id', $request->booking_class_id)
-    //             ->where('user_id', $user->id)
-    //             ->where('status', 'approved')
-    //             ->lockForUpdate()
-    //             ->first();
-
-    //         if (!$approvedRoom) {
-    //             return [
-    //                 'status' => false,
-    //                 'message' => 'Anda harus memiliki peminjaman ruangan yang telah disetujui.'
-    //             ];
-    //         }
-
-    //         // Lock item agar stok tidak race
-    //         $item = Item::where('id', $request->item_id)->lockForUpdate()->first();
-    //         if (!$item) {
-    //             return ['status' => false, 'message' => 'Barang tidak ditemukan.'];
-    //         }
-
-    //         if ($item->stock < $request->qty) {
-    //             return [
-    //                 'status' => false,
-    //                 'message' => 'Stok barang tidak mencukupi.'
-    //             ];
-    //         }
-
-    //         // Ambil semua peminjaman barang yg conflict (booking item pada booking_class yang sama)
-    //         $existing = BookingItem::where('item_id', $request->item_id)
-    //             ->where('booking_classes_id', $request->booking_class_id)
-    //             ->whereIn('status', ['pending', 'approved'])
-    //             ->lockForUpdate()
-    //             ->get();
-
-    //         // cek priority
-    //         if ($existing->isNotEmpty()) {
-    //             foreach ($existing as $ex) {
-    //                 $exPriority = $rolePriority[$ex->user->role] ?? 99;
-
-    //                 // Kalau existing memiliki prioritas lebih tinggi atau sama → tolak
-    //                 if ($exPriority <= $currentPriority) {
-    //                     return [
-    //                         'status' => false,
-    //                         'message' => 'Gagal — barang ini sedang dipinjam oleh user dengan prioritas sama/lebih tinggi.'
-    //                     ];
-    //                 }
-    //             }
-
-    //             // Override existing pending yg prioritasnya lebih rendah
-    //             $lowPending = $existing->where('status', 'pending');
-    //             foreach ($lowPending as $p) {
-    //                 $p->status = 'rejected';
-    //                 $p->save();
-    //             }
-    //         }
-
-    //         // Kurangi stok setelah semua aman
-    //         $item->stock -= $request->qty;
-    //         $item->save();
-
-    //         // Simpan booking item baru
-    //         BookingItem::create([
-    //             'faculty_id' => $request->faculty_id,
-    //             'user_id' => $user->id,
-    //             'booking_classes_id' => $request->booking_class_id,
-    //             'item_id' => $request->item_id,
-    //             'qty' => $request->qty,
-    //             'hari_pengembalian' => $request->hari_pengembalian,
-    //             'tanggal_pengembalian' => $request->tanggal_pengembalian,
-    //             'jam_pengembalian' => $request->jam_pengembalian,
-    //             'status' => 'pending',
-    //         ]);
-
-    //         return ['status' => true, 'message' => 'Peminjaman barang berhasil disimpan!'];
-    //     }, 5);
-
-    //     if (!$result['status']) {
-    //         return redirect()->back()->withInput()->with(['error' => $result['message']]);
-    //     }
-
-    //     return redirect()->route('bookingitem.index')->with(['success' => $result['message']]);
-    // }
 }

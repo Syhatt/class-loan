@@ -49,8 +49,7 @@
                                             @csrf @method('PUT')
                                             <input type="hidden" name="status" value="returned">
                                             <button class="btn btn-success btn-sm"
-                                                onclick="return confirm('Konfirmasi barang sudah dikembalikan?')">Mark
-                                                Returned</button>
+                                                onclick="return confirm('Konfirmasi barang sudah dikembalikan?')">Konfirmasi Pengembalian</button>
                                         </form>
                                     @endif
                                 </td>

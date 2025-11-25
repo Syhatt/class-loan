@@ -238,7 +238,7 @@ class BookingController extends Controller
     //             return $existingStart->lte($newEnd) && $existingEnd->gte($newStart);
     //         });
 
-    //         /* 
+    //         /*
     //     ===================================================
     //     1️⃣ FIRST RULE — EXISTING BOOKING SELALU MENANG
     //     ===================================================
@@ -269,7 +269,7 @@ class BookingController extends Controller
     //     ===================================================
     //     */
 
-    //         // Deteksi race condition: 
+    //         // Deteksi race condition:
     //         // Jika overlaps kosong tapi sebenarnya ada transaksi lain sedang create,
     //         // maka record masih belum terlihat (uncommitted).
     //         // Laravel tidak bisa "melihat" row uncommitted transaksi lain.

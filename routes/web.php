@@ -39,7 +39,7 @@ Route::middleware(['auth', 'role:admin_fakultas,superadmin'])->group(function ()
     // Manajemen kelas & barang
     Route::resource('class', ClassController::class);
     Route::patch('/class/{id}/toggle', [ClassController::class, 'toggleStatus'])->name('class.toggle');
-    Route::patch('/class/{id}/delete-image/{index}', [ClassController::class, 'deleteImage'])->name('class.deleteImage');
+    Route::patch('class/{id}/image/{index}', [ClassController::class, 'deleteImage'])->name('class.deleteImage');
     Route::resource('item', ItemController::class);
     Route::resource('faculty', FacultyController::class);
     Route::resource('user', UserController::class);
