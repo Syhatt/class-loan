@@ -4,6 +4,7 @@ use App\Http\Controllers\admin\BookClassController;
 use App\Http\Controllers\admin\BookItemController;
 use App\Http\Controllers\admin\ClassController;
 use App\Http\Controllers\admin\FacultyController;
+use App\Http\Controllers\admin\StudyProgramController;
 use App\Http\Controllers\admin\ItemController;
 use App\Http\Controllers\admin\ReportClassController;
 use App\Http\Controllers\admin\ReportController;
@@ -42,6 +43,7 @@ Route::middleware(['auth', 'role:admin_fakultas,superadmin'])->group(function ()
     Route::patch('class/{id}/image/{index}', [ClassController::class, 'deleteImage'])->name('class.deleteImage');
     Route::resource('item', ItemController::class);
     Route::resource('faculty', FacultyController::class);
+    Route::resource('study_program', StudyProgramController::class);
     Route::resource('user', UserController::class);
 
     // Approval dan pengelolaan peminjaman
