@@ -33,11 +33,24 @@
 </head>
 
 <body>
+    @php
+        $monthName = $month ? DateTime::createFromFormat('!m', $month)->format('F') : 'Semua Bulan';
 
-    <h3>LAPORAN PEMINJAMAN RUANGAN & BARANG</h3>
-    <p style="text-align:center;">Periode:
-        {{ DateTime::createFromFormat('!m', $month)->format('F') }} {{ $year }}
+        $facultyName = $faculty ?? 'Semua Fakultas';
+    @endphp
+
+    <h4 style="text-align:center;">
+        Laporan Peminjaman Ruangan & Barang<br>
+        {{ $monthName }} {{ $year }} <br>
+        Fakultas: {{ $facultyName }}
+    </h4>
+
+    <hr>
+
+    <p style="text-align:center; font-size:14px;">
+        Periode: {{ $monthName }} {{ $year }}
     </p>
+
 
     <table>
         <thead>
