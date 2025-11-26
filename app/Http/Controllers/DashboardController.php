@@ -14,37 +14,61 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $facultyId = Auth::user()->faculty_id;
+        $user = Auth::user();
+        $isSuperAdmin = $user->role === 'superadmin';
 
-        // Statistik singkat
-        $totalKelas = Classmodel::where('faculty_id', $facultyId)->count();
-        $kelasAktif = Classmodel::where('faculty_id', $facultyId)->where('is_available', true)->count();
+        // Jika superadmin -> semua fakultas, jika bukan -> filter fakultas user
+        $facultyFilter = $isSuperAdmin ? null : $user->faculty_id;
+
+        // Total kelas
+        $totalKelas = Classmodel::when(!$isSuperAdmin, function ($q) use ($facultyFilter) {
+            $q->where('faculty_id', $facultyFilter);
+        })->count();
+
+        $kelasAktif = Classmodel::when(!$isSuperAdmin, function ($q) use ($facultyFilter) {
+            $q->where('faculty_id', $facultyFilter);
+        })->where('is_available', true)->count();
+
         $kelasNonaktif = $totalKelas - $kelasAktif;
-        $totalMahasiswa = User::where('faculty_id', $facultyId)->count();
-        $totalBooking = BookingClass::whereHas('classmodel', fn($q) => $q->where('faculty_id', $facultyId))->count();
+
+        // Total mahasiswa
+        $totalMahasiswa = User::when(!$isSuperAdmin, function ($q) use ($facultyFilter) {
+            $q->where('faculty_id', $facultyFilter);
+        })->count();
+
+        // Total booking
+        $totalBooking = BookingClass::when(!$isSuperAdmin, function ($q) use ($facultyFilter) {
+            $q->whereHas('classmodel', fn($q2) => $q2->where('faculty_id', $facultyFilter));
+        })->count();
 
         // Peminjaman terbaru
-        $peminjamanTerbaru = BookingClass::whereHas('classmodel', fn($q) => $q->where('faculty_id', $facultyId))
+        $peminjamanTerbaru = BookingClass::when(!$isSuperAdmin, function ($q) use ($facultyFilter) {
+            $q->whereHas('classmodel', fn($q2) => $q2->where('faculty_id', $facultyFilter));
+        })
             ->latest()
             ->take(5)
             ->get();
 
-        // Grafik tren peminjaman per bulan (12 bulan terakhir)
+        // Grafik tren
         $bookingTren = BookingClass::select(
             DB::raw('MONTH(start_date) as bulan'),
             DB::raw('COUNT(*) as total')
         )
-            ->whereHas('classmodel', fn($q) => $q->where('faculty_id', $facultyId))
-            ->whereYear('start_date', Carbon::now()->year)
+            ->when(!$isSuperAdmin, function ($q) use ($facultyFilter) {
+                $q->whereHas('classmodel', fn($q2) => $q2->where('faculty_id', $facultyFilter));
+            })
+            ->whereYear('start_date', now()->year)
             ->where('status', 'approved')
             ->groupBy('bulan')
             ->orderBy('bulan')
             ->pluck('total', 'bulan')
             ->toArray();
 
-        // Top 5 kelas paling sering dipinjam
+        // Top kelas
         $topKelas = BookingClass::select('classmodel_id', DB::raw('COUNT(*) as total'))
-            ->whereHas('classmodel', fn($q) => $q->where('faculty_id', $facultyId))
+            ->when(!$isSuperAdmin, function ($q) use ($facultyFilter) {
+                $q->whereHas('classmodel', fn($q2) => $q2->where('faculty_id', $facultyFilter));
+            })
             ->where('status', 'approved')
             ->groupBy('classmodel_id')
             ->with('classmodel')
@@ -60,27 +84,30 @@ class DashboardController extends Controller
             'totalBooking',
             'peminjamanTerbaru',
             'bookingTren',
-            'topKelas'
+            'topKelas',
+            'isSuperAdmin'
         ));
     }
 
     public function databooking()
     {
-        $facultyId = Auth::user()->faculty_id;
+        $user = Auth::user();
+        $isSuperAdmin = $user->role === 'superadmin';
 
-        $bookings = BookingClass::whereHas('classmodel', fn($q) => $q->where('faculty_id', $facultyId))
-            ->where('status', 'approved') // hanya yang approved
+        $bookings = BookingClass::when(!$isSuperAdmin, function ($q) use ($user) {
+            $q->whereHas('classmodel', fn($q2) => $q2->where('faculty_id', $user->faculty_id));
+        })
+            ->where('status', 'approved')
             ->get();
 
-        $events = [];
-        foreach ($bookings as $booking) {
-            $events[] = [
+        $events = $bookings->map(function ($booking) {
+            return [
                 'title' => 'Ruangan: ' . $booking->classmodel->name,
                 'start' => $booking->start_date,
                 'end'   => Carbon::parse($booking->end_date)->addDay()->toDateString(),
-                'color' => '#28a745', // hijau menandakan approved
+                'color' => '#28a745',
             ];
-        }
+        });
 
         return response()->json($events);
     }
