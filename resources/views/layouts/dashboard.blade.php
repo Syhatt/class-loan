@@ -1,8 +1,14 @@
 @extends('layouts.master')
 @section('content')
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Dashboard Fakultas</h1>
-    </div>
+    <h1 class="h3 mb-0 text-gray-800">
+    Dashboard
+    @if (auth()->user()->role === 'superadmin')
+        Universitas
+     @else
+        Fakultas
+     @endif
+    </h1>
+
 
     {{-- === Statistik Card === --}}
     <div class="row">

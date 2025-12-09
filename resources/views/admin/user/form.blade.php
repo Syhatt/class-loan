@@ -77,7 +77,7 @@
     <select name="role"
             class="form-control @error('role') is-invalid @enderror">
         <option value="">-- Pilih Role --</option>
-        @foreach (['admin_ruangan', 'admin_barang', 'user', 'dosen'] as $role)
+        @foreach (['admin_fakultas', 'dosen', 'user'] as $role)
             <option value="{{ $role }}"
                 {{ old('role', $user->role ?? '') == $role ? 'selected' : '' }}>
                 {{ ucfirst(str_replace('_', ' ', $role)) }}

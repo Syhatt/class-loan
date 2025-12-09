@@ -3,8 +3,6 @@
 namespace App\Helpers;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Storage;
-use PhpOffice\PhpWord\TemplateProcessor;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
@@ -12,155 +10,184 @@ class NodinBarangGenerator
 {
     public static function generate($booking, $namaKabag, $nipKabag, $signaturePath)
     {
-        // Ambil data barang yang dipinjam - JIKA LEBIH DARI 1 BARANG, SESUAIKAN LOGIKA INI
         $itemName = $booking->item->name ?? '-';
-        $itemQty = $booking->qty ?? 0;
-        
-        // Format tanggal
-        $tanggalKegiatan = Carbon::parse($booking->bookingClass->start_date)->translatedFormat('d F Y');
-        $tanggalSuratDibuat = Carbon::now()->translatedFormat('d F Y');
-        $hariPengembalian = $booking->hari_pengembalian ?? '-';
-        $tanggalPengembalian = $booking->tanggal_pengembalian 
-            ? Carbon::parse($booking->tanggal_pengembalian)->translatedFormat('d F Y') 
-            : '-';
-        $jamPengembalian = $booking->jam_pengembalian ?? '-';
+        $itemQty  = $booking->qty ?? 0;
 
-        // Buat HTML untuk PDF
+        $tanggalKegiatan      = Carbon::parse($booking->bookingClass->start_date)->translatedFormat('d F Y');
+        $tanggalSuratDibuat   = Carbon::now()->translatedFormat('d F Y');
+        $hariPengembalian     = $booking->hari_pengembalian ?? '-';
+        $tanggalPengembalian  = $booking->tanggal_pengembalian
+            ? Carbon::parse($booking->tanggal_pengembalian)->translatedFormat('d F Y')
+            : '-';
+        $jamPengembalian      = $booking->jam_pengembalian ?? '-';
+
+        $itemsHtml = "
+            <tr>
+                <td style='width: 20px;'>1.</td>
+                <td>{$itemName} ({$itemQty} unit)</td>
+            </tr>
+        ";
+
         $html = "
         <style>
+            @page {
+                margin: 15px 20px;
+            }
+            * {
+                box-sizing: border-box;
+            }
             body {
                 font-family: Arial, sans-serif;
-                font-size: 12pt;
-                line-height: 1.6;
-                margin: 40px;
+                font-size: 10pt;
+                line-height: 1.15;
+                margin: 0;
             }
             h3 {
                 text-align: center;
-                margin-bottom: 5px;
-                font-size: 14pt;
+                margin: 0 0 8px 0;
+                font-size: 11.5pt;
+                text-transform: uppercase;
             }
-            .center {
-                text-align: center;
+            p {
+                margin: 2px 0;
             }
             table {
                 width: 100%;
-                margin-top: 20px;
                 border-collapse: collapse;
             }
-            table td {
-                padding: 5px;
+            td {
                 vertical-align: top;
+                padding: 1px 0;
             }
-            .signature-section {
-                margin-top: 50px;
-                text-align: right;
+            .section {
+                margin-top: 6px;
             }
-            .signature-section p {
-                margin: 5px 0;
-            }
-            .notes {
-                margin-top: 30px;
+            .section-title {
+                margin-top: 8px;
                 font-weight: bold;
             }
-            hr {
-                border: none;
-                border-top: 2px solid #000;
-                margin: 10px 0;
+            .ttd-wrapper {
+                margin-top: 14px;
+            }
+            .ttd-table {
+                width: 100%;
+            }
+            .ttd-left, .ttd-right {
+                font-size: 10pt;
+            }
+            .ttd-left {
+                width: 55%;
+            }
+            .ttd-right {
+                width: 45%;
+                text-align: left;
+            }
+            .ttd-space {
+                height: 32px;
+            }
+            .notes-title {
+                margin-top: 10px;
+                font-weight: bold;
+            }
+            .sub-table td:first-child {
+                width: 110px;
+            }
+            .sub-table td:nth-child(2) {
+                width: 12px;
             }
         </style>
-        
+
         <h3>SURAT PERNYATAAN KESANGGUPAN</h3>
-        
-        <table style='margin-top: 30px;'>
-            <tr>
-                <td colspan='3'><strong>Saya yang bertandatangan dibawah ini:</strong></td>
-            </tr>
-            <tr>
-                <td style='width: 150px;'>Nama</td>
-                <td style='width: 20px;'>:</td>
-                <td>{$booking->user->name}</td>
-            </tr>
-            <tr>
-                <td>NIM</td>
-                <td>:</td>
-                <td>{$booking->user->nim}</td>
-            </tr>
-            <tr>
-                <td>Organisasi</td>
-                <td>:</td>
-                <td>{$booking->bookingClass->organization}</td>
-            </tr>
-            <tr>
-                <td>Nomor WA</td>
-                <td>:</td>
-                <td>{$booking->bookingClass->telp}</td>
-            </tr>
-        </table>
 
-        <table style='margin-top: 20px;'>
-            <tr>
-                <td style='width: 150px;'>Tanggal</td>
-                <td style='width: 20px;'>:</td>
-                <td>{$tanggalKegiatan}</td>
-            </tr>
-            <tr>
-                <td>Kegiatan</td>
-                <td>:</td>
-                <td>{$booking->bookingClass->activity_name}</td>
-            </tr>
-        </table>
-
-        <table style='margin-top: 20px;'>
-            <tr>
-                <td style='width: 30px;'>1.</td>
-                <td>{$itemName} ({$itemQty} unit)</td>
-            </tr>
-        </table>
-
-        <p style='margin-top: 20px; text-align: justify;'>
-            <strong>Bertanggung jawab/menggantikan kerusakan akibat kelalaian saya atau peserta kegiatan 
-            {$booking->bookingClass->activity_name}.</strong>
-        </p>
-
-        <p style='margin-top: 15px; text-align: justify;'>
-            Demikianlah surat pernyataan kesanggupan ini dibuat untuk digunakan sebagaimana mestinya.
-        </p>
-
-        <div class='signature-section'>
-            <p>Surabaya, {$tanggalSuratDibuat}</p>
-            <p>Yang Menyatakan,</p>
-            <br><br><br>
-            <p><strong>{$booking->user->name}</strong></p>
-            <p>{$booking->user->nim}</p>
+        <div class='section'>
+            <p>Saya yang bertanda tangan di bawah ini:</p>
+            <table>
+                <tr>
+                    <td style='width: 110px;'>Nama</td>
+                    <td style='width: 12px;'>:</td>
+                    <td>{$booking->user->name}</td>
+                </tr>
+                <tr>
+                    <td>NIM</td>
+                    <td>:</td>
+                    <td>{$booking->user->nim}</td>
+                </tr>
+                <tr>
+                    <td>Organisasi</td>
+                    <td>:</td>
+                    <td>{$booking->bookingClass->organization}</td>
+                </tr>
+                <tr>
+                    <td>Nomor WA</td>
+                    <td>:</td>
+                    <td>{$booking->bookingClass->telp}</td>
+                </tr>
+            </table>
         </div>
 
-        <table style='margin-top: 40px;'>
-            <tr>
-                <td style='width: 200px;'><strong>Mengetahui</strong></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td colspan='2'><strong>Kabag Tata Usaha {$booking->faculty->name}</strong></td>
-            </tr>
-            <tr>
-                <td colspan='2' style='padding-top: 10px;'>
-                    <img src='" . public_path('storage/' . $signaturePath) . "' height='80' style='display: block;'>
-                </td>
-            </tr>
-            <tr>
-                <td colspan='2'><strong>{$namaKabag}</strong></td>
-            </tr>
-            <tr>
-                <td colspan='2'>{$nipKabag}</td>
-            </tr>
-        </table>
-
-        <div class='notes'>
-            <p>Barang yang saya pinjam akan saya kembalikan pada:</p>
-            <table style='margin-top: 10px;'>
+        <div class='section'>
+            <table>
                 <tr>
-                    <td style='width: 150px;'>Hari</td>
-                    <td style='width: 20px;'>:</td>
+                    <td style='width: 110px;'>Tanggal</td>
+                    <td style='width: 12px;'>:</td>
+                    <td>{$tanggalKegiatan}</td>
+                </tr>
+                <tr>
+                    <td>Kegiatan</td>
+                    <td>:</td>
+                    <td>{$booking->bookingClass->activity_name}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class='section'>
+            <table>
+                {$itemsHtml}
+            </table>
+        </div>
+
+        <div class='section' style='text-align: justify;'>
+            <p>
+                Bertanggung jawab/mengganti kerusakan akibat kelalaian saya atau peserta kegiatan
+                {$booking->bookingClass->activity_name}.
+            </p>
+        </div>
+
+        <div class='section' style='text-align: justify;'>
+            <p>
+                Demikianlah surat pernyataan kesanggupan ini dibuat untuk digunakan sebagaimana mestinya.
+            </p>
+        </div>
+
+        <div class='ttd-wrapper'>
+            <table class='ttd-table'>
+                <tr>
+                    <td class='ttd-left'>
+                        <p>Mengetahui</p>
+                        <p>Kabag Tata Usaha {$booking->faculty->name},</p>
+                        <div class='ttd-space'>
+                            <img src='" . public_path('storage/' . $signaturePath) . "' height='55'>
+                        </div>
+                        <p><strong>{$namaKabag}</strong></p>
+                        <p>{$nipKabag}</p>
+                    </td>
+                    <td class='ttd-right'>
+                        <p>Surabaya, {$tanggalSuratDibuat}</p>
+                        <p>Yang Menyatakan,</p>
+                        <div class='ttd-space'></div>
+                        <p><strong>{$booking->user->name}</strong></p>
+                        <p>{$booking->user->nim}</p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class='section'>
+            <p class='section-title'>Barang yang saya pinjam akan saya kembalikan pada:</p>
+            <table class='sub-table'>
+                <tr>
+                    <td>Hari</td>
+                    <td>:</td>
                     <td>{$hariPengembalian}</td>
                 </tr>
                 <tr>
@@ -176,35 +203,32 @@ class NodinBarangGenerator
             </table>
         </div>
 
-        <div style='margin-top: 30px;'>
-            <p><strong>Catatan:</strong></p>
-            <p><strong>- Menyerahkan KTP Ke Tatausaha Fakultas</strong></p>
-            <p><strong>- Menyerahkan Surat Pernyataan kesanggupan ke Tatausaha Fakultas</strong></p>
+        <div class='section'>
+            <p class='notes-title'>Catatan:</p>
+            <p>- Menyerahkan KTP ke Tatausaha Fakultas</p>
+            <p>- Menyerahkan Surat Pernyataan Kesanggupan ke Tatausaha Fakultas</p>
         </div>
         ";
 
-        // Setup Dompdf
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
-        
+
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        // Simpan PDF
         $fileName = 'surat_kesanggupan_barang_' . $booking->id . '.pdf';
-        $pdfPath = storage_path('app/public/nodin_barang/' . $fileName);
-        
-        // Buat folder jika belum ada
-        if (!file_exists(storage_path('app/public/nodin_barang'))) {
-            mkdir(storage_path('app/public/nodin_barang'), 0755, true);
+        $dirPath  = storage_path('app/public/nodin_barang');
+        $pdfPath  = $dirPath . '/' . $fileName;
+
+        if (!file_exists($dirPath)) {
+            mkdir($dirPath, 0755, true);
         }
 
         file_put_contents($pdfPath, $dompdf->output());
 
-        // Return relative path untuk disimpan di database
         return 'storage/nodin_barang/' . $fileName;
     }
 }

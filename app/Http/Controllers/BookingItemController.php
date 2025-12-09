@@ -44,9 +44,15 @@ class BookingItemController extends Controller
         $pageTitle = 'Form Peminjaman Barang';
         $items = Item::findOrFail($id);
 
+        $today = Carbon::today();
+
         // ambil semua peminjaman ruangan yg sudah approved milik user ini
+        // DAN yang end_date-nya belum lewat hari ini
         $approvedRooms = BookingClass::where('user_id', auth()->id())
             ->where('status', 'approved')
+            ->whereDate('end_date', '>=', $today)
+            ->with('classmodel')
+            ->orderBy('start_date')
             ->get();
 
         return view('bookingitem.create', compact('pageTitle', 'items', 'approvedRooms'));
@@ -139,10 +145,14 @@ class BookingItemController extends Controller
         // SIMPAN DENGAN TRANSAKSI (untuk jaga-jaga race condition stok)
         $result = DB::transaction(function () use ($request, $user, $hari_pengembalian) {
 
-            // pastikan ruangan yang dipilih milik user dan sudah approved
+            $today = Carbon::today();
+
+            // pastikan ruangan yang dipilih milik user, sudah approved,
+            // DAN belum lewat end_date
             $approvedRoom = BookingClass::where('id', $request->booking_class_id)
                 ->where('user_id', $user->id)
                 ->where('status', 'approved')
+                ->whereDate('end_date', '>=', $today)
                 ->lockForUpdate()
                 ->first();
 
@@ -150,7 +160,7 @@ class BookingItemController extends Controller
                 return [
                     'status'  => false,
                     'field'   => null,
-                    'message' => 'Anda harus memiliki peminjaman ruangan yang telah disetujui.',
+                    'message' => 'Anda harus memiliki peminjaman ruangan yang telah disetujui dan belum melewati tanggal berakhir.',
                 ];
             }
 
@@ -172,9 +182,6 @@ class BookingItemController extends Controller
                     'message' => 'Stok barang tidak mencukupi. Stok tersisa: ' . $item->stock . '.',
                 ];
             }
-
-            // ❌ TIDAK ADA LAGI LOGIKA CEK BOOKINGITEM EXISTING / PRIORITAS
-            // Selama stok cukup, boleh dipinjam oleh peminjam lain.
 
             // kurangi stok
             $item->stock -= $request->qty;
