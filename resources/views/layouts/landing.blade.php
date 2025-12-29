@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'ClassLoan UINSA - Sistem Peminjaman Terintegrasi')</title>
+    <title>@yield('title', 'SIFASA UINSA - Sistem Peminjaman Terintegrasi')</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -48,7 +48,7 @@
                         class="w-10 h-10 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-lg flex items-center justify-center">
                         <i data-lucide="book-open" class="w-6 h-6 text-white"></i>
                     </div>
-                    <span class="text-xl font-bold text-gray-900">ClassLoan UINSA</span>
+                    <span class="text-xl font-bold text-gray-900">SIFASA UINSA</span>
                 </div>
                 <div class="flex items-center space-x-4">
                     <a href="#"
@@ -80,7 +80,7 @@
                             class="w-8 h-8 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-lg flex items-center justify-center">
                             <i data-lucide="book-open" class="w-5 h-5 text-white"></i>
                         </div>
-                        <span class="text-lg font-bold">ClassLoan UINSA</span>
+                        <span class="text-lg font-bold">SIFASA UINSA</span>
                     </div>
                     <p class="text-gray-400">
                         Sistem peminjaman kelas dan barang terintegrasi untuk Universitas Islam Negeri Sunan Ampel
@@ -108,7 +108,7 @@
                 <div>
                     <h4 class="font-semibold mb-4">Kontak</h4>
                     <ul class="space-y-2 text-gray-400">
-                        <li>support@classloan.uinsa.ac.id</li>
+                        <li>support@sifasa.uinsa.ac.id</li>
                         <li>(031) 1234-5678</li>
                         <li>UINSA Surabaya</li>
                         <li>Jl. Ahmad Yani No. 117</li>
@@ -116,7 +116,7 @@
                 </div>
             </div>
             <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>© {{ date('Y') }} ClassLoan UINSA. All rights reserved.</p>
+                <p>© {{ date('Y') }} SIFASA UINSA. All rights reserved.</p>
             </div>
         </div>
     </footer>

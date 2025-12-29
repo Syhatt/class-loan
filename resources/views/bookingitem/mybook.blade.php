@@ -7,7 +7,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            {{-- <a href="{{ route('item.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Tambah</a> --}}
+            {{-- kosong --}}
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -17,36 +17,39 @@
                             <th>No</th>
                             <th>Fakultas</th>
                             <th>User</th>
-                            <th>Kelas</th>
+                            <th>Ruangan</th>
                             <th>Barang</th>
                             <th>Jumlah</th>
                             <th>Status</th>
                             <th>Nodin</th>
                         </tr>
                     </thead>
+
                     <tbody>
-                        @foreach ($bookitem as $bookitem)
-                            {{-- mengambil value dari class --}}
-                            {{-- dd($bookitem->bookingClass->classmodel->name) --}}
+                        @foreach ($bookitem as $row)
                             <tr class="text-center">
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $bookitem->faculty->name }}</td>
-                                <td>{{ $bookitem->user->name }}</td>
-                                <td>{{ $bookitem->bookingClass->classmodel->name }}</td>
-                                <td>{{ $bookitem->item->name }}</td>
-                                <td>{{ $bookitem->qty }}</td>
+                                <td>{{ $row->faculty->name }}</td>
+                                <td>{{ $row->user->name }}</td>
+                                <td>{{ $row->bookingClass->classmodel->name }}</td>
+                                <td>{{ $row->item->name }}</td>
+                                <td>{{ $row->qty }}</td>
+
                                 <td>
-                                    @if ($bookitem->status == 'approved')
+                                    @if ($row->status == 'approved')
                                         <span class="badge badge-success">Approved</span>
-                                    @elseif ($bookitem->status == 'rejected')
-                                        <span class="badge badge-danger">rejected</span>
-                                    @else
+                                    @elseif ($row->status == 'pending')
                                         <span class="badge badge-warning">Pending</span>
+                                    @elseif ($row->status == 'returned')
+                                        <span class="badge badge-primary">Dikembalikan</span>
+                                    @else
+                                        <span class="badge badge-danger">Rejected</span>
                                     @endif
                                 </td>
+
                                 <td>
-                                    @if ($bookitem->nodin_barang)
-                                        <a href="{{ asset($bookitem->nodin_barang) }}" class="btn btn-primary btn-sm"
+                                    @if (!empty($row->nodin_barang))
+                                        <a href="{{ asset('storage/' . $row->nodin_barang) }}" class="btn btn-primary btn-sm"
                                             target="_blank">
                                             <i class="fas fa-download"></i> Download
                                         </a>
@@ -57,6 +60,7 @@
                             </tr>
                         @endforeach
                     </tbody>
+
                 </table>
             </div>
         </div>

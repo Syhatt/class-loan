@@ -17,7 +17,7 @@ class ClassController extends Controller
      */
     public function index(Request $request)
     {
-        $pageTitle = 'Kelas';
+        $pageTitle = 'Ruangan';
 
         // Jika superadmin → bisa lihat semua + filter fakultas
         if (auth()->user()->role === 'superadmin') {

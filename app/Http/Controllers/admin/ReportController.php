@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\admin;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BookingClass;
@@ -15,33 +15,36 @@ class ReportController extends Controller
         $pageTitle = 'Laporan Peminjaman Ruangan & Barang';
 
         // tahun default = tahun sekarang
-        $year  = $request->year ?? Carbon::now()->year;
+        $year = $request->year ?? Carbon::now()->year;
 
-        // bulan boleh kosong (null / '' = semua bulan)
-        $month = $request->month; // jangan kasih default bulan sekarang
+        // bulan opsional (null = semua bulan)
+        $month = $request->month;
 
         $facultyId = auth()->user()->faculty_id;
 
-        // query dasar: semua data di tahun tsb
         $query = BookingClass::with(['user', 'classmodel', 'bookingItems.item'])
             ->where('faculty_id', $facultyId)
             ->whereYear('start_date', $year);
 
-        // kalau bulan diisi (tidak kosong) → filter per bulan
+        // filter bulan jika dipilih
         if (!empty($month)) {
             $query->whereMonth('start_date', $month);
         }
 
         $data = $query->get();
 
-        return view('admin.reports.index', compact('pageTitle', 'data', 'month', 'year'));
+        return view('admin.reports.index', compact(
+            'pageTitle',
+            'data',
+            'month',
+            'year'
+        ));
     }
 
     public function exportPdf(Request $request)
     {
-        // sama seperti index()
         $year  = $request->year ?? Carbon::now()->year;
-        $month = $request->month; // bisa null / ''
+        $month = $request->month;
 
         $facultyId = auth()->user()->faculty_id;
 
@@ -55,14 +58,20 @@ class ReportController extends Controller
 
         $data = $query->get();
 
+        // penamaan file
+        $title = $month
+            ? "Laporan Bulan " . Carbon::create()->month($month)->translatedFormat('F')
+            : "Laporan Tahunan";
+
         $pdf = Pdf::loadView('admin.reports.pdf', [
             'data'  => $data,
-            'month' => $month,
             'year'  => $year,
+            'month' => $month,
+            'title' => $title,
         ])->setPaper('A4', 'landscape');
 
-        $monthName = $month ? str_pad($month, 2, '0', STR_PAD_LEFT) : 'all';
-
-        return $pdf->stream("Laporan_Peminjaman_{$monthName}_{$year}.pdf");
+        return $pdf->download(
+            str_replace(' ', '_', $title) . "_{$year}.pdf"
+        );
     }
 }

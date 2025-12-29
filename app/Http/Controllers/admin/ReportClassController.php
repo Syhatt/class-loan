@@ -11,7 +11,7 @@ class ReportClassController extends Controller
 {
     public function index()
     {
-        $pageTitle = 'Laporan Peminjaman Kelas';
+        $pageTitle = 'Laporan Peminjaman Ruangan';
 
         return view('admin.report.class', compact('pageTitle'));
     }

@@ -1,6 +1,6 @@
 @extends('layouts.landing')
 
-@section('title', 'ClassLoan UINSA - Sistem Peminjaman Kelas & Barang Terintegrasi')
+@section('title', 'SIFASA UINSA - Sistem Peminjaman Kelas & Barang Terintegrasi')
 
 @section('content')
     <!-- Hero Section -->
@@ -11,12 +11,15 @@
                 <span class="text-sm font-medium">Sistem Peminjaman Terintegrasi UINSA</span>
             </div>
 
-            <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-[1.25] pb-1">
                 Peminjaman Kelas & Barang
-                <span class="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-emerald-600">
+                <span
+                class="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-emerald-600 leading-[1.25] pb-1">
                     Lebih Mudah, Lebih Cepat, Lebih Terorganisir
                 </span>
             </h1>
+
+
 
             <p class="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
                 Sistem peminjaman modern untuk Universitas Islam Negeri Sunan Ampel Surabaya.

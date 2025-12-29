@@ -1,22 +1,22 @@
 @extends('layouts.master')
 @section('content')
     <h1 class="h3 mb-0 text-gray-800">
-    Dashboard
-    @if (auth()->user()->role === 'superadmin')
-        Universitas
-     @else
-        Fakultas
-     @endif
+        Dashboard
+        @if (auth()->user()->role === 'superadmin')
+            Universitas
+        @else
+            Fakultas
+        @endif
     </h1>
-
 
     {{-- === Statistik Card === --}}
     <div class="row">
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
-                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Kelas Aktif</div>
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Ruangan Aktif</div>
                     <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $kelasAktif }}</div>
+                    {{-- kalau controller sudah diganti: pakai $ruanganAktif --}}
                 </div>
             </div>
         </div>
@@ -24,8 +24,9 @@
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-danger shadow h-100 py-2">
                 <div class="card-body">
-                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Kelas Nonaktif</div>
+                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Ruangan Nonaktif</div>
                     <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $kelasNonaktif }}</div>
+                    {{-- kalau controller sudah diganti: pakai $ruanganNonaktif --}}
                 </div>
             </div>
         </div>
@@ -71,11 +72,12 @@
                 </div>
             </div>
         </div>
+
         <div class="col">
-            {{-- === Top Kelas Terbanyak Dipinjam === --}}
+            {{-- === Top Ruangan Terbanyak Dipinjam === --}}
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h5 class="m-0 font-weight-bold text-primary">Top 5 Kelas yang Sering Dipinjam</h5>
+                    <h5 class="m-0 font-weight-bold text-primary">Top 5 Ruangan yang Sering Dipinjam</h5>
                 </div>
                 <div class="card-body">
                     <ul class="list-group">
@@ -92,9 +94,6 @@
             </div>
         </div>
     </div>
-
-
-
 
     {{-- === Peminjaman Terbaru === --}}
     <div class="card shadow mb-4">
@@ -139,43 +138,41 @@
 @endsection
 
 @push('script')
-    <script>
-        // === Kalender ===
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-                initialView: 'dayGridMonth',
-                locale: 'id',
-                events: "{{ route('bookings.data') }}",
-                eventClick: function(info) {
-                    alert(info.event.title);
-                }
-            });
-            calendar.render();
-        });
-
-        // === Grafik Tren Peminjaman ===
-        const ctx = document.getElementById('chartPeminjaman');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
-                datasets: [{
-                    label: 'Jumlah Peminjaman',
-                    data: @json(array_values($bookingTren)),
-                    borderWidth: 2,
-                    borderColor: '#007bff',
-                    fill: false,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
+<script>
+    // === Kalender ===
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+            initialView: 'dayGridMonth',
+            locale: 'id',
+            events: "{{ route('bookings.data') }}",
+            eventClick: function(info) {
+                alert(info.event.title);
             }
         });
-    </script>
+        calendar.render();
+    });
+
+    // === Grafik Tren Peminjaman ===
+    const ctx = document.getElementById('chartPeminjaman');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+            datasets: [{
+                label: 'Jumlah Peminjaman',
+                data: @json(array_values($bookingTren)),
+                borderWidth: 2,
+                borderColor: '#007bff',
+                fill: false,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
 @endpush

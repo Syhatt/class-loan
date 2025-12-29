@@ -12,9 +12,6 @@ use Carbon\Carbon;
 
 class BookingItemController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $pageTitle = 'Peminjaman Barang';
@@ -36,9 +33,6 @@ class BookingItemController extends Controller
         return view('bookingitem.index', compact('pageTitle', 'item'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create($id)
     {
         $pageTitle = 'Form Peminjaman Barang';
@@ -46,8 +40,6 @@ class BookingItemController extends Controller
 
         $today = Carbon::today();
 
-        // ambil semua peminjaman ruangan yg sudah approved milik user ini
-        // DAN yang end_date-nya belum lewat hari ini
         $approvedRooms = BookingClass::where('user_id', auth()->id())
             ->where('status', 'approved')
             ->whereDate('end_date', '>=', $today)
@@ -58,12 +50,8 @@ class BookingItemController extends Controller
         return view('bookingitem.create', compact('pageTitle', 'items', 'approvedRooms'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        // VALIDASI AWAL (tanpa hari_pengembalian, hari dihitung otomatis dari tanggal)
         $request->validate(
             [
                 'item_id'              => 'required|exists:items,id',
@@ -89,23 +77,7 @@ class BookingItemController extends Controller
 
         $user = auth()->user();
 
-        // CEK ITEM + STOK (awal, sebelum transaksi, utk error yg rapi di qty)
-        $item = Item::find($request->item_id);
-        if (!$item) {
-            return back()
-                ->withErrors(['item_id' => 'Barang tidak ditemukan.'])
-                ->withInput();
-        }
-
-        if ($request->qty > $item->stock) {
-            return back()
-                ->withErrors([
-                    'qty' => 'Jumlah yang diminta melebihi stok yang tersedia (stok: ' . $item->stock . ').',
-                ])
-                ->withInput();
-        }
-
-        // PETA HARI DALAM BAHASA INDONESIA (ISO: 1=Senin ... 7=Minggu)
+        // PETA HARI (ISO)
         $hariArray = [
             1 => 'Senin',
             2 => 'Selasa',
@@ -114,41 +86,37 @@ class BookingItemController extends Controller
             5 => 'Jumat',
         ];
 
-        // CEK HANYA HARI KERJA (SENIN–JUMAT)
+        // CEK HARI KERJA
         $tanggal = Carbon::parse($request->tanggal_pengembalian);
-        $dayIndex = $tanggal->dayOfWeekIso; // 1=Mon ... 7=Sun
+        $dayIndex = $tanggal->dayOfWeekIso;
 
         if ($dayIndex > 5) {
             return back()
-                ->withErrors([
-                    'tanggal_pengembalian' => 'Pengembalian hanya dapat dilakukan pada hari kerja (Senin sampai Jumat).',
-                ])
+                ->withErrors(['tanggal_pengembalian' => 'Pengembalian hanya dapat dilakukan pada hari kerja (Senin sampai Jumat).'])
                 ->withInput();
         }
 
-        // HITUNG HARI PENGEMBALIAN OTOMATIS
         $hari_pengembalian = $hariArray[$dayIndex];
 
         // CEK JAM 07:00–15:00
         $jam = Carbon::createFromFormat('H:i', $request->jam_pengembalian);
-        $start = Carbon::createFromTime(7, 0, 0);   // 07:00
-        $end   = Carbon::createFromTime(15, 0, 0);  // 15:00
+        $start = Carbon::createFromTime(7, 0, 0);
+        $end   = Carbon::createFromTime(15, 0, 0);
 
         if ($jam->lt($start) || $jam->gt($end)) {
             return back()
-                ->withErrors([
-                    'jam_pengembalian' => 'Jam pengembalian hanya diperbolehkan antara pukul 07.00 sampai 15.00.',
-                ])
+                ->withErrors(['jam_pengembalian' => 'Jam pengembalian hanya diperbolehkan antara pukul 07.00 sampai 15.00.'])
                 ->withInput();
         }
 
-        // SIMPAN DENGAN TRANSAKSI (untuk jaga-jaga race condition stok)
-        $result = DB::transaction(function () use ($request, $user, $hari_pengembalian) {
+        // datetime pengembalian
+        $returnDT = Carbon::parse($request->tanggal_pengembalian . ' ' . $request->jam_pengembalian);
+
+        $result = DB::transaction(function () use ($request, $user, $hari_pengembalian, $returnDT) {
 
             $today = Carbon::today();
 
-            // pastikan ruangan yang dipilih milik user, sudah approved,
-            // DAN belum lewat end_date
+            // pastikan ruangan milik user, approved, belum lewat
             $approvedRoom = BookingClass::where('id', $request->booking_class_id)
                 ->where('user_id', $user->id)
                 ->where('status', 'approved')
@@ -164,7 +132,30 @@ class BookingItemController extends Controller
                 ];
             }
 
-            // lock item supaya stok aman
+            // ✅ Validasi pengembalian: >= start ruangan, <= end+3 hari
+            $roomStart = Carbon::parse($approvedRoom->start_date . ' ' . ($approvedRoom->start_time ?? '00:00'));
+            $roomEnd   = Carbon::parse($approvedRoom->end_date   . ' ' . ($approvedRoom->end_time   ?? '23:59'));
+
+            if ($returnDT->lt($roomStart)) {
+                return [
+                    'status'  => false,
+                    'field'   => 'tanggal_pengembalian',
+                    'message' => 'Tanggal/jam pengembalian tidak boleh sebelum waktu mulai peminjaman ruangan (' .
+                                 $roomStart->format('d-m-Y H:i') . ').',
+                ];
+            }
+
+            $maxReturn = $roomEnd->copy()->addDays(3);
+            if ($returnDT->gt($maxReturn)) {
+                return [
+                    'status'  => false,
+                    'field'   => 'tanggal_pengembalian',
+                    'message' => 'Maksimal pengembalian adalah 3 hari setelah peminjaman ruangan selesai (' .
+                                 $maxReturn->format('d-m-Y H:i') . ').',
+                ];
+            }
+
+            // lock item
             $item = Item::where('id', $request->item_id)->lockForUpdate()->first();
             if (!$item) {
                 return [
@@ -174,7 +165,45 @@ class BookingItemController extends Controller
                 ];
             }
 
-            // CEK STOK LAGI DI DALAM TRANSAKSI
+            // PRIORITAS ROLE (GREEDY untuk PENDING)
+            $rolePriority = [
+                'superadmin'     => 1,
+                'admin_fakultas' => 2,
+                'dosen'          => 3,
+                'user'           => 4,
+            ];
+            $currentPriority = $rolePriority[$user->role] ?? 99;
+
+            // ✅ kalau stok kurang, coba "ambil" dari booking pending prioritas lebih rendah (greedy)
+            if ($item->stock < $request->qty) {
+                $pendingBookings = BookingItem::where('item_id', $item->id)
+                    ->where('status', 'pending')
+                    ->with('user')
+                    ->lockForUpdate()
+                    ->get()
+                    ->sortBy(function ($b) use ($rolePriority) {
+                        return $rolePriority[$b->user->role] ?? 99;
+                    });
+
+                foreach ($pendingBookings as $pending) {
+                    $pendingPriority = $rolePriority[$pending->user->role] ?? 99;
+
+                    // hanya override yang prioritasnya lebih rendah
+                    if ($pendingPriority > $currentPriority) {
+                        $pending->status = 'rejected';
+                        $pending->save();
+
+                        // kembalikan stok dari booking yang dibatalkan
+                        $item->stock += $pending->qty;
+
+                        if ($item->stock >= $request->qty) {
+                            break; // greedy stop
+                        }
+                    }
+                }
+            }
+
+            // ✅ setelah greedy, baru final check stok
             if ($item->stock < $request->qty) {
                 return [
                     'status'  => false,
@@ -187,7 +216,6 @@ class BookingItemController extends Controller
             $item->stock -= $request->qty;
             $item->save();
 
-            // simpan booking item
             BookingItem::create([
                 'faculty_id'           => $request->faculty_id ?? $item->faculty_id,
                 'user_id'              => $user->id,
@@ -207,7 +235,6 @@ class BookingItemController extends Controller
             ];
         }, 5);
 
-        // HANDLE GAGAL DARI TRANSAKSI
         if (!$result['status']) {
             if (!empty($result['field'])) {
                 return redirect()

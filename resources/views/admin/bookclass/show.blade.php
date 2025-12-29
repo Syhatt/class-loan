@@ -205,7 +205,7 @@
             <div class="col-lg-8">
                 <table class="table table-hover table-striped table-bordered">
                     <tr>
-                        <td><strong>Kelas</strong></td>
+                        <td><strong>Ruangan</strong></td>
                         <td>:</td>
                         <td>{{ $booking->classmodel->name }}</td>
                     </tr>
@@ -314,7 +314,7 @@
 
                                     <div class="form-group text-left">
                                         <label>No Surat Nota Dinas <span class="text-danger">*</span></label>
-                                        <input type="text" name="no_surat" class="form-control" 
+                                        <input type="text" name="no_surat" class="form-control"
                                                placeholder="Contoh: 001/FST/2025" required>
                                         @error('no_surat')
                                             <small class="text-danger">{{ $message }}</small>
@@ -323,7 +323,7 @@
 
                                     <div class="form-group text-left">
                                         <label>Nama Wakil Dekan <span class="text-danger">*</span></label>
-                                        <input type="text" name="nama_wadek" class="form-control" 
+                                        <input type="text" name="nama_wadek" class="form-control"
                                                placeholder="Contoh: Dr. H. Ahmad, M.Pd" required>
                                         @error('nama_wadek')
                                             <small class="text-danger">{{ $message }}</small>

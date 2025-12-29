@@ -15,7 +15,7 @@ class BookClassController extends Controller
      */
     public function index()
     {
-        $pageTitle = 'Data Peminjaman Kelas';
+        $pageTitle = 'Data Peminjaman Ruangan';
         $booking = BookingClass::where('faculty_id', auth()->user()->faculty_id)->get();
 
         return view('admin.bookclass.index', compact('pageTitle', 'booking'));
@@ -75,8 +75,9 @@ class BookClassController extends Controller
                 // Update status
                 $booking->update(['status' => 'approved']);
 
-                return redirect()->route('bookclass.index')
-                    ->with(['success' => 'Peminjaman berhasil disetujui dan Nota Dinas telah digenerate!']);
+                return redirect()->route('bookclass.show', $booking->id)
+                    ->with('success', 'Peminjaman berhasil disetujui dan Nota Dinas telah digenerate!');
+
             } catch (\Exception $e) {
                 return redirect()->back()
                     ->with(['error' => 'Gagal generate Nota Dinas: ' . $e->getMessage()]);

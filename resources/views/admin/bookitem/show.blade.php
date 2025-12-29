@@ -9,6 +9,26 @@
         <i class="fas fa-arrow-left"></i> Kembali
     </a>
 
+    {{-- ================= NOTIFIKASI ================= --}}
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Sukses!</strong> {{ session('success') }}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error!</strong> {{ session('error') }}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+    @endif
+    {{-- ================================================= --}}
+
     <div class="card shadow mb-4">
         <div class="card-body">
             <h5>Detail Peminjaman Barang</h5>
@@ -98,13 +118,14 @@
                 </tr>
             </table>
 
+            {{-- ================= FORM / HASIL ================= --}}
             @if ($booking->status === 'pending')
                 <div class="card mt-4">
                     <div class="card-header bg-primary text-white">
                         <h6 class="mb-0">Form Approval Peminjaman Barang</h6>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('bookitem.update', $booking->id) }}" method="post"
+                        <form action="{{ route('bookitem.update', $booking->id) }}" method="POST"
                             enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
@@ -130,17 +151,14 @@
                             <div class="form-group">
                                 <label>Upload Tanda Tangan Kabag <span class="text-danger">*</span></label>
                                 <input type="file" name="ttd_kabag" class="form-control" accept="image/*" required>
-                                <small class="form-text text-muted">Format: PNG, JPG, JPEG. Max: 2MB</small>
                                 @error('ttd_kabag')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
 
-                            <div class="mt-3">
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-check-circle"></i> Approve & Generate Surat
-                                </button>
-                            </div>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check-circle"></i> Approve & Generate Surat
+                            </button>
                         </form>
 
                         <form action="{{ route('bookitem.update', $booking->id) }}" method="POST" class="mt-2">

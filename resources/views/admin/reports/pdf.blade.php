@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-
 <head>
+    <meta charset="utf-8">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,8 +14,7 @@
             margin-top: 10px;
         }
 
-        th,
-        td {
+        th, td {
             border: 1px solid #000;
             padding: 6px;
             text-align: center;
@@ -29,14 +28,25 @@
             text-align: center;
             margin: 0;
         }
+
+        .periode {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 11px;
+        }
     </style>
 </head>
-
 <body>
 
     <h3>LAPORAN PEMINJAMAN RUANGAN & BARANG</h3>
-    <p style="text-align:center;">Periode:
-        {{ DateTime::createFromFormat('!m', $month)->format('F') }} {{ $year }}
+
+    <p class="periode">
+        Periode:
+        @if ($month)
+            {{ \Carbon\Carbon::create()->month($month)->translatedFormat('F') }} {{ $year }}
+        @else
+            Tahun {{ $year }}
+        @endif
     </p>
 
     <table>
@@ -52,36 +62,49 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($data as $loan)
-                @php $items = $loan->bookingItems; @endphp
+            @php $no = 1; @endphp
 
-                @if ($items->count() > 0)
-                    @foreach ($items as $item)
+            @forelse ($data as $loan)
+                @if ($loan->bookingItems->count() > 0)
+                    @foreach ($loan->bookingItems as $item)
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $no++ }}</td>
                             <td>{{ $loan->user->name }}</td>
                             <td>{{ $loan->organization }}</td>
                             <td>{{ $loan->classmodel->name }}</td>
-                            <td>{{ $loan->start_date }} s/d {{ $loan->end_date }}</td>
+                            <td>
+                                {{ \Carbon\Carbon::parse($loan->start_date)->format('d-m-Y') }}
+                                s/d
+                                {{ \Carbon\Carbon::parse($loan->end_date)->format('d-m-Y') }}
+                            </td>
                             <td>{{ $item->item->name }}</td>
                             <td>{{ $item->qty }}</td>
                         </tr>
                     @endforeach
                 @else
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $no++ }}</td>
                         <td>{{ $loan->user->name }}</td>
                         <td>{{ $loan->organization }}</td>
                         <td>{{ $loan->classmodel->name }}</td>
-                        <td>{{ $loan->start_date }} s/d {{ $loan->end_date }}</td>
+                        <td>
+                            {{ \Carbon\Carbon::parse($loan->start_date)->format('d-m-Y') }}
+                            s/d
+                            {{ \Carbon\Carbon::parse($loan->end_date)->format('d-m-Y') }}
+                        </td>
                         <td>-</td>
                         <td>-</td>
                     </tr>
                 @endif
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="7" style="text-align:center;">
+                        Tidak ada data peminjaman
+                    </td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 
 </body>
-
 </html>

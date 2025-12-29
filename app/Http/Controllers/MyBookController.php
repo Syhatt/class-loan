@@ -10,7 +10,7 @@ class MyBookController extends Controller
 {
     public function index()
     {
-        $pageTitle = 'Peminjaman Saya';
+        $pageTitle = 'Peminjaman Ruangan Saya';
         $booking = BookingClass::where('user_id', Auth::id())->orderBy('start_time', 'desc')->get();
 
         return view('booking.mybook', compact('pageTitle', 'booking'));
